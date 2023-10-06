@@ -2,7 +2,6 @@
 .include "tiles/menu_1.data"
 .include "tiles/zelda_text.data"
 .include "tiles/zelda_hud.data"
-.include "tiles/tela_1_teste.data"
 .include "tiles/link_teste.data"
 .include "tiles/link_walk.data"
 .include "tiles/link_atack_down.data"

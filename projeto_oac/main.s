@@ -70,25 +70,13 @@ GAME_LOOP:
 	csrr t1, time
 	sub t1,t1,s11
 	
-	ble t1,t0, GAME_LOOP
-	
-	li a7, 1
-	mv a0, t1
-	ecall
-	
-	li a7, 4
-	la a0,taldobarra
-	ecall
+	ble t1,t0, GAME_LOOP # caso o codigo seja todo executado mais rapido q a duracao do frame
 	
 	csrr s11, time
 	
 	xori s0,s0,1  # troca frame
-	la a0,tela_1
-	
-	call MAP_MANAGER
-	
-	
-	
+	call MAP_MANAGER 
+
 	la a0,link_walk
 	la t0, link_sprite_num 
 	lb t0,0(t0)
