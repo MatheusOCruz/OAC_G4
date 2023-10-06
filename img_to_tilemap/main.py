@@ -75,7 +75,7 @@ for map in os.listdir(map_img_dir):
 
         with open(tile_path, 'w') as file:
             for linha in tile_map:
-                file_line = ",".join([f"{x}," for x in linha])
+                file_line = "".join([f"{x}," for x in linha])
                 file.write(file_line+",\n")
 
 
