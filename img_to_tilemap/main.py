@@ -74,9 +74,12 @@ for map in os.listdir(map_img_dir):
         tile_path = os.path.join(tile_map_dir, tile_map_name)
 
         with open(tile_path, 'w') as file:
+            header_line = os.path.splitext(map)[0]+ f"_tilemap: .word  {len(tile_map[0])}, {len(tile_map)}\n"
+            file.write(header_line)
+            file.write(".byte\n")
             for linha in tile_map:
                 file_line = "".join([f"{x}," for x in linha])
-                file.write(file_line+",\n")
+                file.write(file_line+"\n")
 
 
 
