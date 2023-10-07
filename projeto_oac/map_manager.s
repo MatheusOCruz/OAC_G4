@@ -1,7 +1,7 @@
 
 .data
 
-.include "tiles/mapa_1_1.data"
+.include "tiles/tilemap_mundo_aberto.data"
 x_inicial: .byte 0
 y_inicial: .byte 64
 
@@ -40,6 +40,8 @@ PRINT_MAP_LOOP:
 	# a3 e fixo
 	li a4,16 # tamanho do trem
 	lb a6,0(s0) # o tile q vai printar
+	la t0, map_localtion
+	lh a7, 0(a0)
 	call PRINT_SPRITE
 	
   	

@@ -1,15 +1,17 @@
 .data
 #.include "MACROSv21.s"
 .text
-j MAIN
+j GAME_PREP
 	
 .data
 
-map_x: .byte 7
-map_y: .byte 7	
-link_pos: .half 128,144
-link_sprite_num: .byte 5
-taldobarra: .ascii "\n"
+
+link_pos: .half 128,144   # pos do link na tela
+link_sprite_num: .byte 5  # char da animacao da andanda
+
+map_localtion: .half 1,2  # qual dos mapas na matrix dos tilemaps o bicho ta 
+
+
 .data 
 .include "input.s"
 .include "print.s"
@@ -64,7 +66,7 @@ GAME_PREP:
 	
 	
 GAME_LOOP:
-	
+	# mantem o jogo em 60 frames 
 	li t0, 16
 	
 	csrr t1, time
@@ -74,27 +76,32 @@ GAME_LOOP:
 	
 	csrr s11, time
 	
+	
 	xori s0,s0,1  # troca frame
 	call MAP_MANAGER 
-
+	
+	# carrega o link no frame
 	la a0,link_walk
 	la t0, link_sprite_num 
 	lb t0,0(t0)
-	mv a6,t0 
+	mv a6,t0    # a6 tem qual sprite da animacao o homi ta
 	
 	la t0,link_pos
-	lh a1,0(t0)
-	lh a2,2(t0)
-	mv a3,s0
-	li a4,16
-	li a5,16
+	lh a1,0(t0) # x do link
+	lh a2,2(t0) # y do link
+	mv a3,s0    # carrega o frame atual
+	li a4,16    # largura do sprite
+	li a5,16    # futuramente usa altura pq tem sprite com mais de 16 (ataque)
+	mv a7,zero  # a7 e usado so pelo tilemap
 	call PRINT_SPRITE
 	
-	li t0,0xFF200604 #altera o frame
-	sw s0,0(t0)
-	la a0,link_walk # pra animacao
-	addi a0,a0,8 
-	call GET_INPUT
+	# pega input e move o homi
+	li t0,0xFF200604 # endereco para mudar frame
+	sw s0,0(t0)      # muda pro frame atual
+	la a0,link_walk  # pra animacao
+	addi a0,a0,8	 # pula tamanho 
+	call GET_INPUT   
+	
 	j GAME_LOOP
 	
 

@@ -38,7 +38,7 @@ PRINT_LOOP:
 #	a4 = largura do sprite
 #	a5 = futuramente altura do sprite no arquivo
 #	a6 = qual pos do sprite
-# 	a7 = futuramenet usado pra quando sptite em matrix	
+# 	a7 = contem o x,y da tela atual na matriz de tilemap	
 #
 #	t0 = endereco do bitmap display	
 #	t1 = endereco da imagem
