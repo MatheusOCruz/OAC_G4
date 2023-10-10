@@ -49,6 +49,12 @@ MV_UP:
 	
 	addi t1,t1,-16
 	sh t1,2(t0)
+	# para animacao
+	la t0, link_sprite_num
+	lb t1,0(t0)
+	li t2,4
+	beq t1,t2,ANIM_2
+	sb t2,0(t0) 
 	
 	ret
 	
@@ -74,6 +80,14 @@ MV_LEFT:
 	
 	addi t2,t2,-16
 	sh t2,0(t0)
+
+
+ 	la t0, link_sprite_num
+	lb t1,0(t0)
+	li t2,6
+	beq t1,t2,ANIM_2
+	sb t2,0(t0) 
+ 
 	ret
 
 MV_DOWN:
@@ -97,6 +111,13 @@ MV_DOWN:
 	
 	addi t1,t1,16
 	sh t1,2(t0)
+
+ 	la t0, link_sprite_num
+	lb t1,0(t0)
+	mv t2,zero
+	beq t1,t2,ANIM_2
+	sb t2,0(t0)
+	
 	ret
 
 MV_RIGHT:
@@ -121,4 +142,11 @@ MV_RIGHT:
 	
 	addi t2,t2,16
 	sh t2,0(t0)
+
+ 	la t0, link_sprite_num
+	lb t1,0(t0)
+	li t2,2
+	beq t1,t2,ANIM_2
+	sb t2,0(t0) 
+ 	
 	ret
