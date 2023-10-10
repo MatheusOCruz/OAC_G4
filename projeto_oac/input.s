@@ -150,3 +150,7 @@ MV_RIGHT:
 	sb t2,0(t0) 
  	
 	ret
+ ANIM_2:
+	addi t2,t2,1
+	sb t2,0(t0)
+	ret
