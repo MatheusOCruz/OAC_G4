@@ -1,7 +1,7 @@
 
 .data
 
-.include "tiles/tilemap_mundo_aberto.data"
+.include "../assets/tiles/tilemap_mundo_aberto.data"
 x_inicial: .byte 0
 y_inicial: .byte 64
 

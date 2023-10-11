@@ -13,9 +13,9 @@ map_localtion: .half 1,2  # qual dos mapas na matrix dos tilemaps o bicho ta
 
 
 .data 
-.include "input.s"
-.include "print.s"
-.include "map_manager.s"
+.include "./modules/input.s"
+.include "./modules/print.s"
+.include "./modules/map_manager.s"
 #.include "SYSTEMv21.s"
 .text	
 #	s0 = frame atual

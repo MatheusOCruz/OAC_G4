@@ -1,11 +1,11 @@
 .data 
-.include "tiles/menu_1.data"
-.include "tiles/zelda_text.data"
-.include "tiles/zelda_hud.data"
-.include "tiles/link_teste.data"
-.include "tiles/link_walk.data"
-.include "tiles/link_atack_down.data"
-.include "tiles/tiles_tela_1.data"
+.include "../assets/tiles/menu_1.data"
+.include "../assets/tiles/zelda_text.data"
+.include "../assets/tiles/zelda_hud.data"
+.include "../assets/tiles/link_teste.data"
+.include "../assets/tiles/link_walk.data"
+.include "../assets/tiles/link_atack_down.data"
+.include "../assets/tiles/tiles_tela_1.data"
 .text
 
 PRINT:
@@ -14,21 +14,17 @@ PRINT:
 	li t0,0xFF0		# endereco incial da memoria FFx0 0000 onde x e o frame
 	add t0,t0,a1 		# selecao do frame (0 ou 1)
 	slli t0,t0,20		# endereco incial da memoria
- 	
- 	
 	
 	li t1, 0x12C00
 	add t1,t1,t0		# endereco final da memoria
 			
-	
-	
-	addi a0,a0,8		# primeiro pixels depois das informações de nlin ncol
+	addi a0,a0,8		# primeiro pixels depois das informaï¿½ï¿½es de nlin ncol
 PRINT_LOOP: 			
 	lw t3,0(a0)		# le um conjunto de 4 pixels : word
-	sw t3,0(t0)		# escreve a word na memória VGA
-	addi t0,t0,4		# soma 4 ao endereço da memoria
+	sw t3,0(t0)		# escreve a word na memï¿½ria VGA
+	addi t0,t0,4		# soma 4 ao endereï¿½o da memoria
 	addi a0,a0,4		# soma 4 ao endereco da imagem
-	bne t0,t1,PRINT_LOOP	# Se for o último endereço então sai do loop
+	bne t0,t1,PRINT_LOOP	# Se for o ï¿½ltimo endereï¿½o entï¿½o sai do loop
 	ret
 
 #	a0 = endereco da imagem
