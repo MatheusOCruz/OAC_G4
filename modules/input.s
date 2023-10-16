@@ -29,8 +29,6 @@ NO_INPUT:
 	ret
 
 MV_UP:	
-	#addi sp,sp,4
-
 	la t0,link_pos
 	la t3,tile_map_mundo_aberto
 	addi t3,t3,8 #pegando a matriz da dela e pulando os dados
@@ -38,21 +36,20 @@ MV_UP:
 	lh t1,2(t0) # eixo y
 	lh t2,0(t0) #eixo x
 	
-	srli t5,t1,4	#indï¿½ce na matriz em y
-	srli t6,t2,4	#indï¿½ce na matriz em x
+	srli t5,t1,4	#indíce na matriz em y
+	srli t2,t2,4	#indíce na matriz em x
 	addi t5,t5,-5 
-	li t4,20        #calculando a posiï¿½ï¿½o do quadrado de cima do boneco
-	mul t5,t5,t4    #cada linha da matriz tem 20 valores, entao multiplica pos y por 20
+	li t4,20      #calculando a posição do quadrado de cima do boneco
+	mul t6,t6,t4
 	add t3,t3,t6
-	add t3,t3,t5    #t3 = posiÃ§Ã£o na matriz
-	div t5,t5,t4    #volta t5 para o valor do indice
+	add t3,t3,t2
 	
 	li t4,-1
 	beq t5,t4,TELA_UP   # t5 = -1 e pq passou do limite da tela, troca de mapa 
 	
 	lb t3,(t3)	     #pega o valor do quadrado
 	#beq t3,(valor do preto), cavernosa
-	bne t3,zero,COLIDE #se o quadrado nï¿½o for vazio, testa colisao
+	bne t3,zero,NO_INPUT #se o quadrado não for vazio, ignora o input
 	
 	addi t1,t1,-16 
 	sh t1,2(t0)
@@ -84,23 +81,23 @@ MV_LEFT:
 	la t3,tile_map_mundo_aberto
 	addi t3,t3,8 #pegando a matriz da dela e pulando os dados
 	
-	lh t1,2(t0) #eixo y
+	lh t1,2(t0) # eixo y
 	lh t2,0(t0) #eixo x
 	
-	srli t5,t1,4	#indï¿½ce na matriz em y
-	srli t6,t2,4	#indï¿½ce na matriz em x
-	addi t5,t5,-4
-	li t4,20        #calculando a posiï¿½ï¿½o do quadrado da esquerda do boneco
-	mul t5,t5,t4
+	srli t1,t1,4	#indíce na matriz em y
+	srli t5,t2,4	#indíce na matriz em x
+	addi t1,t1,-4
+	li t4,20      #calculando a posição do quadrado da esquerda do boneco
+	mul t1,t1,t4
+	add t3,t3,t1
 	add t3,t3,t5
-	add t3,t3,t6
 	addi t3,t3,-1
-	div t5,t5,t4
 	
-	beq t6,zero,TELA_LEFT
+	
+	beq t5,zero,TELA_LEFT
 	
 	lb t3,(t3)	     #pega o valor do quadrado
-	bne t3,zero,COLIDE #se o quadrado nï¿½o for vazio, testa colisÃ£o
+	bne t3,zero,NO_INPUT #se o quadrado não for vazio, ignora o input
 	
 	addi t2,t2,-16
 	sh t2,0(t0)
@@ -134,20 +131,19 @@ MV_DOWN:
 	lh t1,2(t0) # eixo Y
 	lh t2,0(t0) #eixo x
 	
-	srli t5,t1,4	#indï¿½ce na matriz em y
-	srli t6,t2,4	#indï¿½ce na matriz em x
+	srli t5,t1,4	#indíce na matriz em y
+	srli t2,t2,4	#indíce na matriz em x
 	addi t5,t5,-3
-	li t4,20      #calculando a posiï¿½ï¿½o do quadrado de baixo do boneco
-	mul t5,t5,t4
+	li t4,20      #calculando a posição do quadrado de baixo do boneco
+	mul t6,t6,t4
 	add t3,t3,t6
-	add t3,t3,t5
-	div t5,t5,t4
+	add t3,t3,t2
 	
 	li t4, 11
 	beq t4,t5,TELA_DOWN
 	
 	lb t3,(t3)	     #pega o valor do quadrado
-	bne t3,zero,COLIDE #se o quadrado nï¿½o for vazio, testa colisao
+	bne t3,zero,NO_INPUT #se o quadrado não for vazio, ignora o input
 	
 	addi t1,t1,16
 	sh t1,2(t0)
@@ -180,22 +176,21 @@ MV_RIGHT:
 	lh t1,2(t0) # eixo Y
 	lh t2,0(t0) #eixo x
 	
-	srli t5,t1,4    #indï¿½ce na matriz em y
-	srli t6,t2,4	#indï¿½ce na matriz em x
-	addi t5,t5,-4
+	srli t1,t1,4    #indíce na matriz em y
+	srli t5,t2,4	#indíce na matriz em x
+	addi t1,t1,-4
 	li t4,20      
-	mul t5,t5,t4
-	add t3,t3,t6
+	mul t1,t1,t4
+	add t3,t3,t1
 	add t3,t3,t5
-	addi t3,t3,1  #calculando a posiï¿½ï¿½o do quadrado da direita do boneco
-	div t5,t5,t4
+	addi t3,t3,1  #calculando a posição do quadrado da direita do boneco
 	
 	
 	li t4,19
-	beq t6,t4,TELA_RIGHT
+	beq t5,t4,TELA_RIGHT
 	
 	lb t3,(t3)	     #pega o valor do quadrado
-	bne t3,zero,COLIDE #se o quadrado nï¿½o for vazio, testa colisao
+	bne t3,zero,NO_INPUT #se o quadrado não for vazio, ignora o input
 	
 	addi t2,t2,16
 	sh t2,0(t0)
@@ -227,5 +222,4 @@ ANIM_2:
 	sb t2,0(t0)
 	ret
 	
-COLIDE: #por enquanto so cancela o movimento. depois da pra adicionar outros testes de colisao
-	ret
+	
