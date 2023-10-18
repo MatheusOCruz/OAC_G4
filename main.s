@@ -6,10 +6,12 @@ j GAME_PREP
 .data
 
 
-link_pos: .half 128,144   # pos do link na tela
+link_pos: .half 128,144   # pos do link na tela y/x
 link_sprite_num: .byte 5  # char da animacao da andanda
 
-map_localtion: .half 1,2  # qual dos mapas na matrix dos tilemaps o bicho ta 
+map_localtion: .half 0,0  # qual dos mapas na matrix dos tilemaps o bicho ta x/y
+
+general_pos: .half 5,8  #posição do boneco no tilemap
 
 
 .data 
@@ -22,6 +24,7 @@ map_localtion: .half 1,2  # qual dos mapas na matrix dos tilemaps o bicho ta
 #
 #
 #	s11 = temporizador pros frames
+
 MAIN:
 	li s0,0
 	la a0,menu_1
@@ -103,40 +106,3 @@ GAME_LOOP:
 	call GET_INPUT   
 	
 	j GAME_LOOP
-	
-
-
-
-
-	
-
-	
-	
-	
-	
-	
-	
-
-
-
-
-
-
-
-
-
-		
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
