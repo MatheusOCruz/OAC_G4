@@ -29,30 +29,35 @@ NO_INPUT:
 	ret
 
 MV_UP:	
-	la t0,link_pos
-	la t3,tile_map_mundo_aberto
+	
+	la t3,teste_mapa_tilemap
+	lh t5,0(t3)
 	addi t3,t3,8 #pegando a matriz da dela e pulando os dados
+	
+	la t1,general_pos
+	lh t2,0(t1) #y
+	addi t2,t2,-1
+	lh t4,2(t1) #x
+	mul t6,t2,t5
+	add t3,t3,t6
+	add t3,t3,t4
+	lb t3,(t3)
+	bne t3,zero,NO_INPUT
+	
+	sh t2,0(t1)
+	
+	la t0,link_pos
 	
 	lh t1,2(t0) # eixo y
 	lh t2,0(t0) #eixo x
 	
-	srli t5,t1,4	#indíce na matriz em y
-	srli t2,t2,4	#indíce na matriz em x
-	addi t5,t5,-5 
-	li t4,20      #calculando a posição do quadrado de cima do boneco
-	mul t6,t6,t4
-	add t3,t3,t6
-	add t3,t3,t2
+	li t4,64
+	beq t1,t4,TELA_UP
 	
-	li t4,-1
-	beq t5,t4,TELA_UP   # t5 = -1 e pq passou do limite da tela, troca de mapa 
-	
-	lb t3,(t3)	     #pega o valor do quadrado
-	#beq t3,(valor do preto), cavernosa
-	bne t3,zero,NO_INPUT #se o quadrado não for vazio, ignora o input
-	
-	addi t1,t1,-16 
+	addi t1,t1,-16
 	sh t1,2(t0)
+	li t1,1
+	
 	
 ANIM_UP:	# para animacao
 	la t0, link_sprite_num  # sprite atual 
@@ -77,27 +82,28 @@ TELA_UP:
 
 	
 MV_LEFT:
-	la t0,link_pos
-	la t3,tile_map_mundo_aberto
+	la t3,teste_mapa_tilemap
+	lh t5,0(t3)
 	addi t3,t3,8 #pegando a matriz da dela e pulando os dados
+	
+	la t1,general_pos
+	lh t2,0(t1) #y
+	lh t4,2(t1) #x
+	addi t4,t4,-1
+	mul t6,t2,t5
+	add t3,t3,t6
+	add t3,t3,t4
+	lb t3,(t3)
+	bne t3,zero,NO_INPUT
+	
+	sh t4,2(t1)
+	
+	la t0,link_pos
 	
 	lh t1,2(t0) # eixo y
 	lh t2,0(t0) #eixo x
 	
-	srli t1,t1,4	#indíce na matriz em y
-	srli t5,t2,4	#indíce na matriz em x
-	addi t1,t1,-4
-	li t4,20      #calculando a posição do quadrado da esquerda do boneco
-	mul t1,t1,t4
-	add t3,t3,t1
-	add t3,t3,t5
-	addi t3,t3,-1
-	
-	
-	beq t5,zero,TELA_LEFT
-	
-	lb t3,(t3)	     #pega o valor do quadrado
-	bne t3,zero,NO_INPUT #se o quadrado não for vazio, ignora o input
+	beq t2,zero,TELA_LEFT
 	
 	addi t2,t2,-16
 	sh t2,0(t0)
@@ -124,33 +130,34 @@ TELA_LEFT:
 	
 
 MV_DOWN:
-	la t0,link_pos
-	la t3,tile_map_mundo_aberto
+	la t3,teste_mapa_tilemap
+	lh t5,0(t3)
 	addi t3,t3,8 #pegando a matriz da dela e pulando os dados
 	
-	lh t1,2(t0) # eixo Y
+	la t1,general_pos
+	lh t2,0(t1) #y
+	addi t2,t2,1
+	lh t4,2(t1) #x
+	mul t6,t2,t5
+	add t3,t3,t6
+	add t3,t3,t4
+	lb t3,(t3)
+	bne t3,zero,NO_INPUT
+	
+	sh t2,0(t1)
+	
+	la t0,link_pos
+	
+	lh t1,2(t0) # eixo y
 	lh t2,0(t0) #eixo x
 	
-	srli t5,t1,4	#indíce na matriz em y
-	srli t2,t2,4	#indíce na matriz em x
-	addi t5,t5,-3
-	li t4,20      #calculando a posição do quadrado de baixo do boneco
-	mul t6,t6,t4
-	add t3,t3,t6
-	add t3,t3,t2
+	li t4,224
+	beq t1,t4,TELA_DOWN
 	
-	li t4, 11
-	beq t4,t5,TELA_DOWN
-	
-	lb t3,(t3)	     #pega o valor do quadrado
-	bne t3,zero,NO_INPUT #se o quadrado não for vazio, ignora o input
-	
-	addi t1,t1,16
+	addi t1,t1,16 
 	sh t1,2(t0)
+	li t1,1
 
- 	
-	
-	
 ANIM_DOWN:
 	la t0, link_sprite_num
 	lb t1,0(t0)
@@ -169,34 +176,32 @@ TELA_DOWN:
 	b ANIM_DOWN
 
 MV_RIGHT:
-	la t0,link_pos
-	la t3,tile_map_mundo_aberto
+	la t3,teste_mapa_tilemap
+	lh t5,0(t3)
 	addi t3,t3,8 #pegando a matriz da dela e pulando os dados
 	
-	lh t1,2(t0) # eixo Y
+	la t1,general_pos
+	lh t2,0(t1) #y
+	lh t4,2(t1) #x
+	addi t4,t4,1
+	mul t6,t2,t5
+	add t3,t3,t6
+	add t3,t3,t4
+	lb t3,(t3)
+	bne t3,zero,NO_INPUT
+	
+	sh t4,2(t1)
+	
+	la t0,link_pos
+	
+	lh t1,2(t0) #eixo y
 	lh t2,0(t0) #eixo x
 	
-	srli t1,t1,4    #indíce na matriz em y
-	srli t5,t2,4	#indíce na matriz em x
-	addi t1,t1,-4
-	li t4,20      
-	mul t1,t1,t4
-	add t3,t3,t1
-	add t3,t3,t5
-	addi t3,t3,1  #calculando a posição do quadrado da direita do boneco
-	
-	
-	li t4,19
-	beq t5,t4,TELA_RIGHT
-	
-	lb t3,(t3)	     #pega o valor do quadrado
-	bne t3,zero,NO_INPUT #se o quadrado não for vazio, ignora o input
+	li t6,304
+	beq t2,t6,TELA_RIGHT
 	
 	addi t2,t2,16
 	sh t2,0(t0)
-
- 	
-
 
 ANIM_RIGHT:
  	la t0, link_sprite_num
