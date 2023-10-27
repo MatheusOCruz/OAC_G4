@@ -129,7 +129,6 @@ PRINT_LINE:  #fa1 = velocidade, fa0 = seno do angulo, fa2 = cos do angulo
 	li a4,152   #definindo os valores de acordo com o ecall
 	mv a5,s0
 	ecall
-	xori s0,s0,1
 	 
 	ret
 	
@@ -186,9 +185,9 @@ TIRO_LOOP:
 	fcvt.w.s a1,ft3  #a1 = pos y
 	fcvt.wu.s a0,ft4  #a0 = pos x
 	
-	blt a1,zero,LOOP  #checa se bateu no chao
+	blt a1,zero,END  #checa se bateu no chao
 	li t0,320
-	bge a0,t0,LOOP  #checa se saiu da tela pela direita
+	bge a0,t0,END  #checa se saiu da tela pela direita
 	li t0,240
 	bge a1,t0,TIRO_LOOP #checa se saiu da tela por cima
 	
@@ -212,6 +211,8 @@ TIRO_PRINT:
 	sb t5,0(t0)	#salva a cor no display
 	
 	b TIRO_LOOP
+
+END:
+	ret
 	
 .include "SYSTEMv21.s"
-
