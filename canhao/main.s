@@ -1,21 +1,85 @@
 .data
-
-.include "seno.data"
-angulo: .byte 48
-velocidade: .half 50
-G: .float 4.905
-
 .include "MACROSv21.s"
 
 
+.data
+.include "seno.data"
+.include "nave.data"
+angulo: .byte 45
+velocidade: .half 50
+G: .float 4.905
+nave_pos: .word 0
+
 .text
+NAVE_SETUP:
+	li a2,0xFF000000 #memoria inicial do display
+	
+	li a7, 42
+	li a0,0
+	li a1, 180  #pega numero aleatorio
+	ecall
+	li t0, 320
+	mul a0,a0,t0
+	add a2,a2,a0  #soma y aleatoria com o endereço inicial
+	
+	li a1,75
+	ecall
+	slli a0,a0,2
+	add a2,a2,a0  #soma x aleatorio com o endereço
+	
+	la t0,nave_pos
+	sw a2,0(t0)
+	
+	b MAIN_LOOP
+
+PRINT_NAVE_SETUP:
+	la t0,nave_pos  #pegando os dados que precisa pra printar a nave
+	
+	lw a2,0(t0)
+	
+	mv t5,s0
+	slli t5,t5,20
+	add a2,a2,t5
+	
+	addi a3,a2,1712
+	addi a3,a3,1712
+	addi a3,a3,1712
+	
+	la a0,nave
+	addi a0,a0,8
+	
+	li a1,16
+	li a4,0
+	
+PRINT_NAVE: #a0 = endereço nave,a1 = largura nave, a2 = posição inicial no display, a3 = posição final no display, a4 = contador
+	lw t0,0(a0)
+	sw t0,0(a2)
+	addi a0,a0,4
+	addi a2,a2,4
+	addi a4,a4,4
+	bge a2,a3,END_NAVE
+	beq a4,a1,PULA_LINHA
+	b PRINT_NAVE
+
+PULA_LINHA:
+	addi a2,a2,304  #passa pra proxima linha
+	li a4,0
+	b PRINT_NAVE
+	
+END_NAVE:
+	ret
+	
 MAIN:	
-	li s0,0  #frame atual
+	li s1,0  #frame atual
 	
-	
-LOOP:
+MAIN_LOOP:
 	jal CHECK_INPUT  #faz a parte dos inputs
-	b LOOP
+	jal PRINT_LINE_DATA
+	jal PRINT_NAVE_SETUP
+	jal LIMPA
+	xori s0,s0,1
+	
+	b MAIN_LOOP
 
 CHECK_INPUT:
 	li t1,0xFF200000  #endereço da memoria do teclado
@@ -39,63 +103,50 @@ CIMA:
 	la t0,angulo  #mira pra cima(aumenta angulo)
 	lb t2,0(t0)
 	li t1,90
-	beq t1,t2,LOOP
+	beq t1,t2,NO_INPUT
 	addi t2,t2,1
 	sb t2,0(t0)
 	li a2,32
-	b PRINT_NUM
+	ret
 
 BAIXO:
 	la t0,angulo  #mira pra baixo
 	lb t2,0(t0)
-	beq zero,t2,LOOP
+	beq zero,t2,NO_INPUT
 	addi t2,t2,-1
 	sb t2,0(t0)
 	li a2,32
-	b PRINT_NUM
+	ret
 
 FORTE:
 	la t0,velocidade  #aumenta força
 	lh t2,0(t0)
 	li t1,255
-	beq t1,t2,LOOP
+	beq t1,t2,NO_INPUT
 	addi t2,t2,1
 	sh t2,0(t0)
 	li a2,50
-	b PRINT_NUM
+	ret
 
 FRACO:
 	la t0,velocidade  #diminui força
 	lh t2,0(t0)
-	beq zero,t2,LOOP
+	beq zero,t2,NO_INPUT
 	addi t2,t2,-1
 	sh t2,0(t0)
 	li a2 50
-	b PRINT_NUM
+	ret
 
 NO_INPUT:
 	ret
 
-PRINT_NUM:
-
-	li a7,148
-	li a0,0		#limpa frame
-	mv a1,s0
-	ecall
-	
-	li a7,101  #essa parte do codigo usa ecall pra printar o valor do angulo e velocidade na tela, nao é obrigatoria ta aqui mais pra teste
-	mv a0,t2
-	li a1,152
-	li a3,0x0050
-	mv a4,s0
-	ecall
-
 PRINT_LINE_DATA:
+
+	
 	la t1,velocidade 
 	lh a0,0(t1)  #a0 = velocidade atual
 	srli a0,a0,2
 	fcvt.s.w fa1,a0
-	
 	
 	la t1,angulo 
 	lb t2,0(t1)  #t2 = angulo atual
@@ -116,6 +167,7 @@ PRINT_LINE_DATA:
 
 PRINT_LINE:  #fa1 = velocidade, fa0 = seno do angulo, fa2 = cos do angulo
 	
+	
 	fmul.s ft0,fa1,fa0  #ft0 = tamanho em y
 	fmul.s ft1,fa2,fa1  #ft1 = tamanho em x
 	
@@ -129,11 +181,17 @@ PRINT_LINE:  #fa1 = velocidade, fa0 = seno do angulo, fa2 = cos do angulo
 	li a4,152   #definindo os valores de acordo com o ecall
 	mv a5,s0
 	ecall
-	 
+	ret
+
+LIMPA:
+	li a7,148
+	li a0,0		#limpa frame
+	mv a1,s0
+	xori a1,a1,1
+	ecall
 	ret
 	
 TIRO_PREP:
-	li s11,0
 	la t1,velocidade
 	lh t0,0(t1)
 	fcvt.s.w ft0,t0  #ft0 = velocidade
@@ -193,12 +251,11 @@ TIRO_LOOP:
 	
 
 TIRO_PRINT:
-	li s11,1
 	li t0,240
 	sub a1,t0,a1  #posição y
 	
 	li t0,0xff000000  #memoria do display
-	slli t1,s0,5
+	slli t1,s0,20
 	add t0,t0,t1  #frame atual
 	
 	li t2,320
