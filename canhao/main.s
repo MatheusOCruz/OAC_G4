@@ -37,34 +37,34 @@ LOOP:
 
 PRINT_NAVE_SETUP:
 	la t0,nave_posx  #pegando os dados que precisa pra printar a nave
-	lw t1,4(t0)
+	lw t1,4(t0)      #pega a posição da nave
 	lw t2,0(t0)
-	slli t2,t2,2
+	slli t2,t2,2	#alinhando a word
 	li t3,320
-	mul t1,t1,t3
+	mul t1,t1,t3	#multiplicando o numero de linhas pelo tamanho da tela
 	add t1,t1,t2
 	li a2,0xff000000
-	add a2,a2,t1
+	add a2,a2,t1	#soma com o inicio do display
 	
 	
 	mv t5,s0
 	slli t5,t5,20
 	add a2,a2,t5
 	
-	addi a3,a2,643
+	addi a3,a2,643	#ponto final do print
 	
-	li a1,3
+	li a1,3	#tamanho da nave
 	li a4,0
-	li t0,150
+	li t0,150	#cor
 	
 PRINT_NAVE: #a0 = endereço nave,a1 = largura nave, a2 = posição inicial no display, a3 = posição final no display, a4 = contador
 
-	sb t0,0(a2)
-	addi a0,a0,1
+	sb t0,0(a2)	#printa na tela
+	addi a0,a0,1	#incrementa a posição na tela
 	addi a2,a2,1
 	addi a4,a4,1
 	bge a2,a3,END_NAVE
-	beq a4,a1,PULA_LINHA
+	beq a4,a1,PULA_LINHA #passa pra proxima linha
 	b PRINT_NAVE
 
 PULA_LINHA:
@@ -274,7 +274,7 @@ LIMPA:
 	li a7,148
 	li a0,0
 	li a1,0
-	ecall
+	ecall  #ecall que apaga a tela
 	
 	mv s9,ra
 	jal PRINT_NAVE_SETUP
@@ -289,7 +289,7 @@ COLISAO: #a0 = pos x, a1 = pos 240 - y
 	lw t2,4(t0)  #t2 = nave y0
 	li t3,240
 	sub t3,t3,a1
-	blt a0,t1,NAO_COLIDE
+	blt a0,t1,NAO_COLIDE #checagem dos casos de colisao
 	addi t1,t1,2
 	bgt a0,t1,NAO_COLIDE
 	blt t3,t2,NAO_COLIDE
@@ -303,6 +303,9 @@ NAO_COLIDE:
 	ret	
 
 CHAO:
+	#pega 4 numeros aleatorio, soma e subtrai eles da posiçao da nave pra aleatorizar a pozição quando erra
+	#t1,t2,t3,t4 sao numeros aleatorios
+
 	la t0,nave_posx
 	
 	li a7,42
@@ -315,8 +318,8 @@ CHAO:
 	ecall
 	mv t3,a0
 	ecall
-	mv t4,a0
-	
+	mv t4,a0  
+    		
 	sub t1,t1,t2
 	sub t3,t3,t4
 	
@@ -328,7 +331,7 @@ CHAO:
 	sw t5,0(t0)
 	sw t6,4(t0)
 	
-	li a7,148
+	li a7,148 #apaga a nave antiga
 	li a0,0
 	li a1,0
 	ecall
