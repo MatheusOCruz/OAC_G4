@@ -33,3 +33,6 @@ ix. Conclusões e Trabalhos futuros;
 x. Referências Bibliográficas.
 
 # Como rodar o projeto 
+
+No diretório raiz executar o comando: 
+`.\lib\fpgrars-8-bit-display.exe .\main.s`
