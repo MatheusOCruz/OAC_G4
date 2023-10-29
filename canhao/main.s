@@ -4,6 +4,8 @@
 angulo: .byte 48
 velocidade: .half 50
 G: .float 4.905
+nave_pos: .word 0
+nave_posx: .word 0,0 #x/y
 
 .include "MACROSv21.s"
 
@@ -11,18 +13,81 @@ G: .float 4.905
 .text
 MAIN:	
 	li s0,0  #frame atual
+
+NAVE_SETUP:
+	la t1,nave_posx
 	
+	li a7, 42
+	li a0,0
+	li a1, 180  #pega numero aleatorio
+	ecall
+	sw a0,4(t1)
+
+
+	li a1,75
+	ecall
+	sw a0,0(t1)
 	
 LOOP:
 	jal CHECK_INPUT  #faz a parte dos inputs
+	jal PRINT_LINE_DATA
+	jal PRINT_NAVE_SETUP
 	b LOOP
+	
+
+PRINT_NAVE_SETUP:
+	la t0,nave_posx  #pegando os dados que precisa pra printar a nave
+	lw t1,4(t0)
+	lw t2,0(t0)
+	slli t2,t2,2
+	li t3,320
+	mul t1,t1,t3
+	add t1,t1,t2
+	li a2,0xff000000
+	add a2,a2,t1
+	
+	
+	mv t5,s0
+	slli t5,t5,20
+	add a2,a2,t5
+	
+	addi a3,a2,643
+	
+	li a1,3
+	li a4,0
+	li t0,150
+	
+PRINT_NAVE: #a0 = endereço nave,a1 = largura nave, a2 = posição inicial no display, a3 = posição final no display, a4 = contador
+
+	sb t0,0(a2)
+	addi a0,a0,1
+	addi a2,a2,1
+	addi a4,a4,1
+	bge a2,a3,END_NAVE
+	beq a4,a1,PULA_LINHA
+	b PRINT_NAVE
+
+PULA_LINHA:
+	addi a2,a2,317  #passa pra proxima linha
+	li a4,0
+	b PRINT_NAVE
+	
+END_NAVE:
+	ret
+	
+	
 
 CHECK_INPUT:
-	li t1,0xFF200000  #endereço da memoria do teclado
-	lw t0,0(t1)		
+	li s1,0xFF200000  #endereço da memoria do teclado
+	lw t0,0(s1)		
 	andi t0,t0,0x0001 	#mascara o bit menos significativo
    	beq t0,zero,NO_INPUT   #pega os inputs
-  	lw t2,4(t1)			
+   	
+   	mv s11,ra
+   	jal LIMPA 
+   	mv ra,s11
+   	
+  	lw t2,4(s1)			
   	li t0,'w'
   	beq t2,t0,CIMA
 	li t0,'q'
@@ -43,7 +108,7 @@ CIMA:
 	addi t2,t2,1
 	sb t2,0(t0)
 	li a2,32
-	b PRINT_NUM
+	ret
 
 BAIXO:
 	la t0,angulo  #mira pra baixo
@@ -52,7 +117,7 @@ BAIXO:
 	addi t2,t2,-1
 	sb t2,0(t0)
 	li a2,32
-	b PRINT_NUM
+	ret
 
 FORTE:
 	la t0,velocidade  #aumenta força
@@ -62,7 +127,7 @@ FORTE:
 	addi t2,t2,1
 	sh t2,0(t0)
 	li a2,50
-	b PRINT_NUM
+	ret
 
 FRACO:
 	la t0,velocidade  #diminui força
@@ -71,24 +136,11 @@ FRACO:
 	addi t2,t2,-1
 	sh t2,0(t0)
 	li a2 50
-	b PRINT_NUM
+	ret
 
 NO_INPUT:
 	ret
 
-PRINT_NUM:
-
-	li a7,148
-	li a0,0		#limpa frame
-	mv a1,s0
-	ecall
-	
-	li a7,101  #essa parte do codigo usa ecall pra printar o valor do angulo e velocidade na tela, nao é obrigatoria ta aqui mais pra teste
-	mv a0,t2
-	li a1,152
-	li a3,0x0050
-	mv a4,s0
-	ecall
 
 PRINT_LINE_DATA:
 	la t1,velocidade 
@@ -127,13 +179,13 @@ PRINT_LINE:  #fa1 = velocidade, fa0 = seno do angulo, fa2 = cos do angulo
 	fcvt.wu.s a3,ft0
 	sub a3,a1,a3
 	li a4,152   #definindo os valores de acordo com o ecall
-	mv a5,s0
+	slli t5,s0,20
+	mv a5,t5
 	ecall
 	 
 	ret
 	
 TIRO_PREP:
-	li s11,0
 	la t1,velocidade
 	lh t0,0(t1)
 	fcvt.s.w ft0,t0  #ft0 = velocidade
@@ -185,20 +237,23 @@ TIRO_LOOP:
 	fcvt.w.s a1,ft3  #a1 = pos y
 	fcvt.wu.s a0,ft4  #a0 = pos x
 	
-	blt a1,zero,END  #checa se bateu no chao
+	blt a1,zero,CHAO  #checa se bateu no chao
 	li t0,320
-	bge a0,t0,END  #checa se saiu da tela pela direita
+	bge a0,t0,CHAO  #checa se saiu da tela pela direita
 	li t0,240
 	bge a1,t0,TIRO_LOOP #checa se saiu da tela por cima
 	
+	mv s11,ra
+	jal COLISAO
+	mv ra,s11
+	
 
-TIRO_PRINT:
-	li s11,1
+TIRO_PRINT:  #a1 = posição y, a0 = posição x
 	li t0,240
 	sub a1,t0,a1  #posição y
 	
 	li t0,0xff000000  #memoria do display
-	slli t1,s0,5
+	slli t1,s0,20
 	add t0,t0,t1  #frame atual
 	
 	li t2,320
@@ -214,5 +269,71 @@ TIRO_PRINT:
 
 END:
 	ret
+
+LIMPA:
+	li a7,148
+	li a0,0
+	li a1,0
+	ecall
+	
+	mv s9,ra
+	jal PRINT_NAVE_SETUP
+	mv ra,s9
+	
+	ret
+
+COLISAO: #a0 = pos x, a1 = pos 240 - y
+	la t0,nave_posx
+	lw t1,0(t0) #t1 = nave x0
+	slli t1,t1,2
+	lw t2,4(t0)  #t2 = nave y0
+	li t3,240
+	sub t3,t3,a1
+	blt a0,t1,NAO_COLIDE
+	addi t1,t1,2
+	bgt a0,t1,NAO_COLIDE
+	blt t3,t2,NAO_COLIDE
+	addi t2,t2,2
+	bgt t3,t2,NAO_COLIDE
+	
+	j NAVE_SETUP
+
+	
+NAO_COLIDE:
+	ret	
+
+CHAO:
+	la t0,nave_posx
+	
+	li a7,42
+	li a0,0
+	li a1 3
+	ecall
+	mv t1,a0
+	ecall
+	mv t2,a0
+	ecall
+	mv t3,a0
+	ecall
+	mv t4,a0
+	
+	sub t1,t1,t2
+	sub t3,t3,t4
+	
+	lw t5,0(t0)
+	lw t6,4(t0)
+	
+	add t5,t5,t1
+	add t6,t6,t3
+	sw t5,0(t0)
+	sw t6,4(t0)
+	
+	li a7,148
+	li a0,0
+	li a1,0
+	ecall
+	
+	ret
+	
 	
 .include "SYSTEMv21.s"
