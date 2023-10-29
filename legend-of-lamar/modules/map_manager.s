@@ -1,11 +1,8 @@
-
 .data
-
-.include "tiles/tilemap_mundo_aberto.data"
-.include "tiles/teste_mapa_tilemap.data"
+.include "../assets/tiles/tilemap_mundo_aberto.data"
+.include "../assets/tiles/teste_mapa_tilemap.data"
 x_inicial: .byte 0
 y_inicial: .byte 64
-
 
 .text
 
