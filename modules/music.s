@@ -1,37 +1,45 @@
 .data
-NOTES: 69,500,76,500,74,500,76,500,79,600, 76,1000,0,1200,69,500,76,500,74,500,76,500,81,600,76,1000
-NOTES_SIZE: .word 13
+# FA LA SI 2x
+NOTES: .word 65, 250, 69, 250, 71, 500, 65, 250, 69, 250, 71, 500, 65, 250, 69, 250, 71, 500
+NUM_OF_NOTES: .word 9
+CURRENT_NOTE_ADDRESS: .word 0
+CURRENT_NOTE_NUM: .word 0
 
-.text 
-# t1 = Endereco das notas
-# t2 = Numero de notas
-# t3 = contador de notas
-
-la t1, NOTES # Carrega o endereço das notas
-lw t2, NOTES_SIZE # Carrega a word do tamanho das notas
-li t3, 0 # Zera o contador de notas
-li a2,68		# define o instrumento
-li a3,127		# define o volume
-
-LOOP:	
-	beq t0,s1, FIM		# contador chegou no final? então  vá para FIM
-	lw a0,0(t1)		# le o valor da nota
-	lw a1,4(t1)		# le a duracao da nota
-	li a7,31		# define a chamada de syscall
-	ecall			# toca a nota
-	mv a0,a1		# passa a duração da nota para a pausa
-	li a7,32		# define a chamada de syscal 
-	ecall			# realiza uma pausa de a0 ms
-	addi t1,t1,8		# incrementa para o endereço da próxima nota
-	addi t3,t3,1		# incrementa o contador de notas
-	j LOOP			# volta ao loop
+.text
+# Carrega todos os valores necessarios
+MUSIC_SETUP:
+	la t0, NOTES		      
+	la t2, CURRENT_NOTE_ADDRESS  # Carrega o endereco da nota atual
+	la t3, CURRENT_NOTE_NUM
 	
-FIM:	li a0,40		# define a nota
-	li a1,1500		# define a duração da nota em ms
-	li a2,127		# define o instrumento
-	li a3,127		# define o volume
-	li a7,33		# define o syscall
-	ecall			# toca a nota
+	li a7 33 		# Define a chamada para o MIDI
+	li a2 0 		# Define o intrumento MIDI
+	li a3 110 		# Define o volume
 	
-	li a7,10		# define o syscall Exit
-	ecall			# exit
+MUSIC_PLAY:
+	lw t4, 0(t2)
+	beqz t4, SET_NOTE # Vai pra SET_NOTE se n tiver endereco em CURRENT_NOTE
+	
+	lw a0, 0(t2)  # Pitch
+	lw a1, 4(t2)  # Duracao
+	ecall 		   # Toca
+	
+	lw t5, 0(t3)
+	addi t5, t5 , 1 # Incrementar o contador
+	addi t4, t2, 8  # Incrementar o endereco da nota e salvar em t4
+	
+	sw t4, 0(t2) # Guardar proxima nota no CURRENT_NOTE_ADDRESS
+	sw t5, 0(t3) # Guardar contador no CURRENT_NOTE_NUM
+	
+	j END
+	
+SET_NOTE:
+	sw t0, 0(t2)
+	la t2, CURRENT_NOTE_ADDRESS
+	j MUSIC_PLAY
+	
+MUSIC_RESET:
+	sw zero, 0(t2)
+	sw zero, 0(t3)
+	
+END:
