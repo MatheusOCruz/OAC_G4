@@ -101,7 +101,7 @@ CHECK_INPUT:
 	beq t0,t2,BAIXO
 	li t0,'a'
 	beq t2,t0,FRACO
-	li t0,'e'
+	li t0,32
 	beq t2,t0,TIRO_PREP
 	ret
 	
@@ -191,6 +191,14 @@ PRINT_LINE:  #fa1 = velocidade, fa0 = seno do angulo, fa2 = cos do angulo
 	ret
 	
 TIRO_PREP:
+
+	li a0,46		#  nota
+	li a1,500		#  tempo
+	li a2,127		#  instrumento
+	li a3,127		#  volume
+	li a7,31		
+	ecall	
+	
 	la t1,velocidade
 	lh t0,0(t1)
 	fcvt.s.w ft0,t0  #ft0 = velocidade
