@@ -1,4 +1,12 @@
 EXPLOSAO:
+ 		
+	li a0,40		#  nota
+	li a1,1500		#  duracao
+	li a2,127		#  instrumento
+	li a3,127		#  volume
+	li a7,31		
+	ecall	
+ 
 	csrr s7,time  #s7 = tempo inicial da animação
 	
 	li a7,148
