@@ -29,7 +29,7 @@ NAVE_SETUP:
 	sw a0,4(t1)
 
 
-	li a1,75
+	li a1,70
 	ecall
 	sw a0,0(t1)
 	
