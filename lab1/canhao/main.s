@@ -4,11 +4,16 @@
 angulo: .byte 48
 velocidade: .half 50
 G: .float 4.905
-nave_pos: .word 0
 nave_posx: .word 0,0 #x/y
+
+
 
 .include "MACROSv21.s"
 
+.text 
+j MAIN
+
+.include "animaçao.s"
 
 .text
 MAIN:	
@@ -37,34 +42,34 @@ LOOP:
 
 PRINT_NAVE_SETUP:
 	la t0,nave_posx  #pegando os dados que precisa pra printar a nave
-	lw t1,4(t0)      #pega a posição da nave
-	lw t2,0(t0)
-	slli t2,t2,2	#alinhando a word
+	lw t1,4(t0)   #y da nave
+	lw t2,0(t0)   #x da nave
+	slli t2,t2,2  #alinha x com a word
 	li t3,320
-	mul t1,t1,t3	#multiplicando o numero de linhas pelo tamanho da tela
+	mul t1,t1,t3  #pula y linhas
 	add t1,t1,t2
-	li a2,0xff000000
-	add a2,a2,t1	#soma com o inicio do display
+	li a2,0xff000000  #memoria inicial do display
+	add a2,a2,t1   #a2= posição da nave
 	
 	
 	mv t5,s0
 	slli t5,t5,20
 	add a2,a2,t5
 	
-	addi a3,a2,643	#ponto final do print
+	addi a3,a2,643  #fim d
 	
-	li a1,3	#tamanho da nave
+	li a1,3
 	li a4,0
-	li t0,150	#cor
+	li t0,150  #cor
 	
 PRINT_NAVE: #a0 = endereço nave,a1 = largura nave, a2 = posição inicial no display, a3 = posição final no display, a4 = contador
 
-	sb t0,0(a2)	#printa na tela
-	addi a0,a0,1	#incrementa a posição na tela
+	sb t0,0(a2)
+	addi a0,a0,1
 	addi a2,a2,1
 	addi a4,a4,1
 	bge a2,a3,END_NAVE
-	beq a4,a1,PULA_LINHA #passa pra proxima linha
+	beq a4,a1,PULA_LINHA
 	b PRINT_NAVE
 
 PULA_LINHA:
@@ -272,12 +277,12 @@ END:
 
 LIMPA:
 	li a7,148
-	li a0,0
+	li a0,0		#limpa a frame
 	li a1,0
-	ecall  #ecall que apaga a tela
+	ecall
 	
 	mv s9,ra
-	jal PRINT_NAVE_SETUP
+	jal PRINT_NAVE_SETUP #volta a nave
 	mv ra,s9
 	
 	ret
@@ -289,14 +294,14 @@ COLISAO: #a0 = pos x, a1 = pos 240 - y
 	lw t2,4(t0)  #t2 = nave y0
 	li t3,240
 	sub t3,t3,a1
-	blt a0,t1,NAO_COLIDE #checagem dos casos de colisao
+	blt a0,t1,NAO_COLIDE
 	addi t1,t1,2
 	bgt a0,t1,NAO_COLIDE
 	blt t3,t2,NAO_COLIDE
 	addi t2,t2,2
 	bgt t3,t2,NAO_COLIDE
 	
-	j NAVE_SETUP
+	b EXPLOSAO
 
 	
 NAO_COLIDE:
@@ -304,34 +309,30 @@ NAO_COLIDE:
 
 CHAO:
 	#pega 4 numeros aleatorio, soma e subtrai eles da posiçao da nave pra aleatorizar a pozição quando erra
-	#t1,t2,t3,t4 sao numeros aleatorios
-
+	#t1,t2,sao numeros aleatorios
 	la t0,nave_posx
 	
 	li a7,42
 	li a0,0
-	li a1 3
+	li a1 6
 	ecall
 	mv t1,a0
 	ecall
 	mv t2,a0
-	ecall
-	mv t3,a0
-	ecall
-	mv t4,a0  
-    		
-	sub t1,t1,t2
-	sub t3,t3,t4
+	 li t3, 3
+	
+	sub t1,t1,t3
+	sub t2,t2,t3
 	
 	lw t5,0(t0)
 	lw t6,4(t0)
 	
 	add t5,t5,t1
-	add t6,t6,t3
+	add t6,t6,t2
 	sw t5,0(t0)
 	sw t6,4(t0)
 	
-	li a7,148 #apaga a nave antiga
+	li a7,148
 	li a0,0
 	li a1,0
 	ecall
