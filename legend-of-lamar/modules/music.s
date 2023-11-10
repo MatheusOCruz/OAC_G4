@@ -1,45 +1,36 @@
 .data
 # FA LA SI 2x
 NOTES: .word 65, 250, 69, 250, 71, 500, 65, 250, 69, 250, 71, 500, 65, 250, 69, 250, 71, 500
-NUM_OF_NOTES: .word 9
-CURRENT_NOTE_ADDRESS: .word 0
-CURRENT_NOTE_NUM: .word 0
+NUM_OF_NOTES: .word 9 # O numero de notas na verdade é esse valor dividido por 8, pra facilitar a logica
+CURRENT_NOTE_INDEX: .word 0 # O indice sempre será o numero que devemos adicionar no endereço original pra encontrar a nota atual
 
 .text
-# Carrega todos os valores necessarios
-MUSIC_SETUP:
-	la t0, NOTES		      
-	la t2, CURRENT_NOTE_ADDRESS  # Carrega o endereco da nota atual
-	la t3, CURRENT_NOTE_NUM
+# Play 
+MUSIC_PLAY:
+	la t0, NOTES		      	 	# Carrega o endereÃ§o inicial das notas
+	la t1, CURRENT_NOTE_INDEX  	# Carrega o indice da nota atual
+	lw t2, 0(t1) 				# Carrega o valor do indice
+	add t0, t0, t2 				# Adiciona o valor do indice no endereço das notas
 	
-	li a7 33 		# Define a chamada para o MIDI
+	lw a0, 0(t0)  	# Carrega a nota atual
+	lw a1, 4(t0)  	# Carrega a duracao
 	li a2 0 		# Define o intrumento MIDI
 	li a3 110 		# Define o volume
+	li a7 33 		# Define a chamada para o MIDI
+	ecall			# toca a nota
 	
-MUSIC_PLAY:
-	lw t4, 0(t2)
-	beqz t4, SET_NOTE # Vai pra SET_NOTE se n tiver endereco em CURRENT_NOTE
+	addi t2, t2, 8 	# Incrementar o valor do index
+	sw t2, 0(t1) 	# Guardar proximo index no CURRENT_NOTE_INDEX
 	
-	lw a0, 0(t2)  # Pitch
-	lw a1, 4(t2)  # Duracao
-	ecall 		   # Toca
+	# Se chegamos no indice final reseta a musica
+	la t3, NUM_OF_NOTES # Carrega o endereço do NUM_OF_NOTES
+	lw t3, 0(t3)		    # Substitui o t3 pelo valor no endereço
+	li t5, 8			    # Carrega 8 em t5
+	mul t4, t3, t5		    # NUM_OF_NOTES * 8
 	
-	lw t5, 0(t3)
-	addi t5, t5 , 1 # Incrementar o contador
-	addi t4, t2, 8  # Incrementar o endereco da nota e salvar em t4
+	ble  t2, t4, FIM 		    	       # Se o indice atual for maior do que o NUM_OF_NOTES agt zera o indice
 	
-	sw t4, 0(t2) # Guardar proxima nota no CURRENT_NOTE_ADDRESS
-	sw t5, 0(t3) # Guardar contador no CURRENT_NOTE_NUM
+	la t0, CURRENT_NOTE_INDEX # Carrega o endereço do index
+	sw zero, 0(t0)			      # Zera o valor
 	
-	j END
-	
-SET_NOTE:
-	sw t0, 0(t2)
-	la t2, CURRENT_NOTE_ADDRESS
-	j MUSIC_PLAY
-	
-MUSIC_RESET:
-	sw zero, 0(t2)
-	sw zero, 0(t3)
-	
-END:
+FIM:	ret
