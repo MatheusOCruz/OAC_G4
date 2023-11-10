@@ -4,11 +4,10 @@ NOTES: .word 	65, 300, 69, 300, 71, 500, 												 # F4 A4 B4
 			65, 300, 69, 300, 71, 500, 												 # F4 A4 B4
 			65, 300, 69, 300, 71, 300,  76, 300, 74, 500, 71, 300, 72, 300, 71, 300, 67, 300, 64, 800 # F4 A4 B4 E5 D5 B4 C5 B4 G4 E4
 			62, 300, 64, 300, 67, 300, 64, 800, 											# D4 E4 G4 E4	
-			
 			65, 300, 69, 300, 71, 500, 												 # F4 A4 B4
 			65, 300, 69, 300, 71, 500, 												 # F4 A4 B4
 			65, 300, 69, 300, 71, 300,  76, 300, 74, 500, 71, 300, 72, 300, 76, 300, 71, 300, 67, 800, # F4 A4 B4 E5 D5 B4 C5 E5 B4 G4
-			71, 300, 67, 300, 62, 300, 64, 800 											# B4 G4 D4 E4
+			71, 300, 67, 300, 62, 300, 64, 800 											 # B4 G4 D4 E4
 			
 NUM_OF_NOTES: .word 40 			# O numero de notas na verdade e esse valor dividido por 8, pra facilitar a logica
 CURRENT_NOTE_INDEX: .word 0 		# O indice sempre sera o numero que devemos adicionar no endereco original pra encontrar a nota atual

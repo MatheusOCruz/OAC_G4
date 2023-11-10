@@ -23,7 +23,7 @@ general_pos: .half 5,8  #posiÃ§Ã£o do boneco no tilemap
 .text	
 #	s0 = frame atual
 #
-#	s10 = temporizador pra musica
+#	s9 = temporizador pra musica
 #	s11 = temporizador pros frames
 
 MAIN:
@@ -80,10 +80,10 @@ GAME_LOOP:
 	la t0, CURRENT_NOTE_DURATION		# So toca uma nota nova passados o tempo da ultima
 	lw t0, 0(t0)						# Carrega o valor da duração da nota
 	csrr t1, time 						# Carrega o tempo atual
-	sub t1, t1, s10 						# Subtrai o tempo atual do tempo da ultima nota
+	sub t1, t1, s9 						# Subtrai o tempo atual do tempo da ultima nota
 	ble t1, t0, NAO_TOCA				# Não toca se n passou 500 ms
 	call MUSIC_PLAY					# Toca a nota
-	csrr s10, time						# Salva o tempo da ultima nota em s10
+	csrr s9, time						# Salva o tempo da ultima nota em s10
 NAO_TOCA:
 	csrr s11, time	# Salva o tempo atual
 	
