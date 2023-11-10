@@ -77,15 +77,16 @@ GAME_LOOP:
 	ble t1,t0, GAME_LOOP 	# se o tempo do ultimo frame for menor que 16 volta pro inicio do loop
 	
 	# limite de notas da musica
-	li t0, 500				# So toca uma nota nova passados 500 ms
-	csrr t1, time 			# Carrega o tempo atual
-	sub t1, t1, s10 			# Subtrai o tempo atual do tempo da ultima nota
-	ble t1, t0, NAO_TOCA	# Não toca se n passou 500 ms
-	call MUSIC_PLAY		# Toca a nota
-	csrr s10, time			# Salva o tempo da ultima nota em s10
+	la t0, CURRENT_NOTE_DURATION		# So toca uma nota nova passados o tempo da ultima
+	lw t0, 0(t0)						# Carrega o valor da duração da nota
+	csrr t1, time 						# Carrega o tempo atual
+	sub t1, t1, s10 						# Subtrai o tempo atual do tempo da ultima nota
+	ble t1, t0, NAO_TOCA				# Não toca se n passou 500 ms
+	call MUSIC_PLAY					# Toca a nota
+	csrr s10, time						# Salva o tempo da ultima nota em s10
 NAO_TOCA:
 
-	csrr s11, time		    # Salva o tempo atual
+	csrr s11, time	# Salva o tempo atual
 	
 	xori s0,s0,1  # troca frame
 	call MAP_MANAGER 
