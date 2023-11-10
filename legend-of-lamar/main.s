@@ -23,7 +23,7 @@ general_pos: .half 5,8  #posição do boneco no tilemap
 .text	
 #	s0 = frame atual
 #
-#
+#	s10 = temporizador pra musica
 #	s11 = temporizador pros frames
 
 MAIN:
@@ -85,7 +85,6 @@ GAME_LOOP:
 	call MUSIC_PLAY					# Toca a nota
 	csrr s10, time						# Salva o tempo da ultima nota em s10
 NAO_TOCA:
-
 	csrr s11, time	# Salva o tempo atual
 	
 	xori s0,s0,1  # troca frame
@@ -95,22 +94,22 @@ NAO_TOCA:
 	la a0,link_walk
 	la t0, link_sprite_num 
 	lb t0,0(t0)
-	mv a6,t0    # a6 tem qual sprite da animacao o homi ta
+	mv a6,t0    		# a6 tem qual sprite da animacao o homi ta
 	
 	la t0,link_pos
-	lh a1,0(t0) # x do link
-	lh a2,2(t0) # y do link
-	mv a3,s0    # carrega o frame atual
-	li a4,16    # largura do sprite
-	li a5,16    # futuramente usa altura pq tem sprite com mais de 16 (ataque)
-	mv a7,zero  # a7 e usado so pelo tilemap
+	lh a1,0(t0) 		# x do link
+	lh a2,2(t0) 		# y do link
+	mv a3,s0    		# carrega o frame atual
+	li a4,16    			# largura do sprite
+	li a5,16    			# futuramente usa altura pq tem sprite com mais de 16 (ataque)
+	mv a7,zero  		# a7 e usado so pelo tilemap
 	call PRINT_SPRITE
 	
 	# pega input e move o homi
-	li t0,0xFF200604 # endereco para mudar frame
-	sw s0,0(t0)      # muda pro frame atual
-	la a0,link_walk  # pra animacao
-	addi a0,a0,8	 # pula tamanho 
+	li t0,0xFF200604 	# endereco para mudar frame
+	sw s0,0(t0)      		# muda pro frame atual
+	la a0,link_walk  	# pra animacao
+	addi a0,a0,8	 	# pula tamanho 
 	call GET_INPUT   
 	
 	j GAME_LOOP

@@ -1,6 +1,7 @@
 .data
-# FA LA SI 2x
-NOTES: .word 65, 250, 69, 250, 71, 500, 65, 250, 69, 250, 71, 500, 65, 250, 69, 250, 71, 500
+# https://ciframelodica.com.br/musicas/zelda-saria-s-song-cancao-de-saria-931/
+NOTES: .word 65, 250, 69, 250, 71, 500, 65, 250, 69, 250, 71, 500, 65, 250, 69, 250, 71, 500,
+			71, 500
 NUM_OF_NOTES: .word 9 			# O numero de notas na verdade é esse valor dividido por 8, pra facilitar a logica
 CURRENT_NOTE_INDEX: .word 0 		# O indice sempre será o numero que devemos adicionar no endereço original pra encontrar a nota atual
 CURRENT_NOTE_DURATION: .word 250 # A duração da nota atual para ser usada na main
