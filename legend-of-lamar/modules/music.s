@@ -16,7 +16,7 @@ MUSIC_PLAY:
 	lw a1, 4(t0)  	# Carrega a duracao
 	li a2 0 		# Define o intrumento MIDI
 	li a3 110 		# Define o volume
-	li a7 33 		# Define a chamada para o MIDI
+	li a7 31 		# Define a chamada para o MIDI
 	ecall			# toca a nota
 	
 	addi t2, t2, 8 	# Incrementar o valor do index

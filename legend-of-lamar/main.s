@@ -18,6 +18,7 @@ general_pos: .half 5,8  #posi√ß√£o do boneco no tilemap
 .include "./modules/input.s"
 .include "./modules/print.s"
 .include "./modules/map_manager.s"
+.include "./modules/music.s"
 #.include "SYSTEMv21.s"
 .text	
 #	s0 = frame atual
@@ -70,15 +71,21 @@ GAME_PREP:
 	
 GAME_LOOP:
 	# mantem o jogo em 60 frames 
-	li t0, 16
+	li t0, 16				# Esse È o periodo em ms no qual o frame tem que ficar em tela para manter em 60fps
+	csrr t1, time 			# Carrega o tempo atual
+	sub t1, t1, s11 			# Subtrai o tempo atual do tempo do ultimo frame
+	ble t1,t0, GAME_LOOP 	# se o tempo do ultimo frame for menor que 16 volta pro inicio do loop
 	
-	csrr t1, time
-	sub t1,t1,s11
-	
-	ble t1,t0, GAME_LOOP # caso o codigo seja todo executado mais rapido q a duracao do frame
-	
-	csrr s11, time
-	
+	# limite de notas da musica
+	li t0, 500				# So toca uma nota nova passados 500 ms
+	csrr t1, time 			# Carrega o tempo atual
+	sub t1, t1, s10 			# Subtrai o tempo atual do tempo da ultima nota
+	ble t1, t0, NAO_TOCA	# N„o toca se n passou 500 ms
+	call MUSIC_PLAY		# Toca a nota
+	csrr s10, time			# Salva o tempo da ultima nota em s10
+NAO_TOCA:
+
+	csrr s11, time		    # Salva o tempo atual
 	
 	xori s0,s0,1  # troca frame
 	call MAP_MANAGER 
