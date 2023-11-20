@@ -22,15 +22,21 @@ MAIN:
 NAVE_SETUP:
 	la t1,nave_posx
 	
-	li a7, 42
+	li a7, 41
 	li a0,0
-	li a1, 180  #pega numero aleatorio
 	ecall
+	li a1, 180  #pega numero aleatorio
+	srli a0,a0,26
+	blt a0,zero,NAVE_SETUP
+	bgt a0,a1,NAVE_SETUP
 	sw a0,4(t1)
-
-
+	
+REDO:
 	li a1,70
 	ecall
+	srli a0,a0,26
+	blt a0,zero,REDO
+	bgt a0,a1,REDO
 	sw a0,0(t1)
 	
 LOOP:
