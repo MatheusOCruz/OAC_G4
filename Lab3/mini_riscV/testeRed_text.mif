@@ -1,0 +1,24 @@
+DEPTH = 16384;
+WIDTH = 32;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+CONTENT
+BEGIN
+00000000 : 01000293;   % 3: 	addi t0,zero,0x10	# t0 = 0x10 %
+00000001 : 00528333;   % 4: 	add t1,t0,t0 		# t1 = 0x20 %
+00000002 : 405303b3;   % 5: 	sub t2,t1,t0		# t2 = 0x10 %
+00000003 : 00537e33;   % 6: 	and t3,t1,t0		# t3 = 0x00 %
+00000004 : 00736eb3;   % 7: 	or  t4,t1,t2		# t4 = 0x30 %
+00000005 : 01d3af33;   % 8: 	slt t5 t2,t4		# t5 = 0x01 %
+00000006 : 01ef4f33;   % 9: 	xor t5,t5,t5		# t5 = 0x00  %
+00000007 : ffc10113;   % 10: 	addi sp,sp,-4 %
+00000008 : 01d12023;   % 11: 	sw t4,0(sp)		# se o lw funciona a gente vai na fe q isso funcionou :) %
+00000009 : 00012f83;   % 12: 	lw t6,0(sp)		# t6 = 0x30  %
+0000000a : 02037313;   % 13: 	andi t1,t1,0x20		# t1 fica igual %
+0000000b : 00236393;   % 14: 	ori t2,t1,0x02		# t2 = 0x22 %
+0000000c : 001f4f13;   % 15: 	xori t5,t5,1		# t5 volta pra 0x01 %
+0000000d : 01ef0463;   % 18: 	beq t5,t5,teste_jal %
+0000000e : 03300293;   % 19: 	addi t0,zero, 0x33	# se t7 = 0x33 deu ruim no beq %
+0000000f : ff9ff0ef;   % 22: 	jal ra, teste_beq %
+00000010 : 03300313;   % 23: 	addi t1,zero,0x33	# se t8 = 0x33 deu ruim pro jal %
+END;
