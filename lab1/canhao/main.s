@@ -25,16 +25,17 @@ NAVE_SETUP:
 	li a7, 41
 	li a0,0
 	ecall
-	li a1, 180  #pega numero aleatorio
-	srli a0,a0,26
+	li a1, 200  #pega numero aleatorio
+	srli a0,a0,24
 	blt a0,zero,NAVE_SETUP
 	bgt a0,a1,NAVE_SETUP
 	sw a0,4(t1)
 	
 REDO:
-	li a1,70
+	li a0,0
+	li a1,200
 	ecall
-	srli a0,a0,26
+	srli a0,a0,24
 	blt a0,zero,REDO
 	bgt a0,a1,REDO
 	sw a0,0(t1)
