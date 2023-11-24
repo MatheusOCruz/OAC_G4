@@ -1,8 +1,10 @@
+
 .data
-.include "../assets/tiles/tilemap_mundo_aberto.data"
-.include "../assets/tiles/teste_mapa_tilemap.data"
+
+.include "tiles/teste_mapa_tilemap.data"
 x_inicial: .byte 0
 y_inicial: .byte 64
+camera:	   .byte 40,22
 
 .text
 
@@ -12,42 +14,46 @@ y_inicial: .byte 64
 # arquivo contem o valor dos tiles q serem printados no mapa
 
 # comeca na linha 64 devido ao hud
-# s0 = endereco do tile atual
+# s0 = endereco do tile atual                     
 # a0 = endereco da imagem
 # a1 = linha
 # a2 = coluna
 # sempre 176 tiles no caso nao pq vou ter q mudar a resolucao mas faz parte
 MAP_MANAGER:
-	add s3,sp,zero
-	 # salva oq tinha em s0 na pilha 
+	
 	mv a3,s0 # bota o frame em a3 antes de botar s0 na pilha
+	li t0,1
+
 	addi sp,sp,-16
 	sw ra,0(sp)
 	sw s0,4(sp)
 	sw s1,8(sp)
 	sw s2,12(sp)
 	
-	la s0, teste_mapa_tilemap # s0 tem o endereco do tile map (na teoria pq ta dando ruim)
-	lw s1, 0(s0)   # largura do mapa inteiro, necessario para pular mudar y do mapa
+	beq s1,t0,CAVE_MANAGER
 	
-	addi s0,s0,8   # atualiza o endereco do s0 pro primeiro que contem info 
+	la s0, teste_mapa_tilemap 	# s0 tem o endereco do tile map (na teoria pq ta dando ruim)
+	lw s1, 0(s0)   			# largura do mapa inteiro, necessario para pular mudar y do mapa
 	
+	addi s0,s0,8  			# atualiza o endereco do s0 pro primeiro que contem info 
 	
-	la t1, map_localtion # var com a posicao da tela atual 
-	lb t2,0(t1)  # x da matriz
-	lb t3,1(t1)  # y da matriz
-	
-	li t4,20      # largura fixa dos mapas
-	mul t2,t2,t4  # como a largura do tileset e sempre fixa (a largura da tela) n precisamos ler do arquivo
-	add s0,s0,t2  # adiciona ao x no endereco inical do tilemap
-	
-	li t2,11      # t2 ja foi usado, da pra usar aqui, altura do mapa tmb e fixa = 11 
-	mul t3,t3,t2  # quantidade de linhas a ser pulada para cheagar no tile inicial
-	
-	mul t3,t3,s1  # multiplica a quantidade de linhas pela quantidade de elementos na linha
-	add s0,s0,t3  # na teoria com fe s0 tem o inicial
+	la t0, camera
+	lb t1,0(t0)	#x
+	lb t2,1(t0)	#y
+	add s0,s0,t1
+	mul t2,t2,s1
+	add s0,s0,t2
 	
 	
+	li a1,0	     # x inicial do print
+	li a2,64     # y inicial do print
+	mv s2,zero   # contador de tiles por linha (max = 20)
+	
+	
+
+	
+	
+END_PREP_MAP:	
 	li a1,0	     # x inicial do print
 	li a2,64     # y inicial do print
 	mv s2,zero   # contador de tiles por linha (max = 20)
@@ -68,6 +74,7 @@ PRINT_MAP_LOOP:
 	addi s2,s2,1
 	li t0, 20
 	beq s2,t0,PRINT_MAP_NL
+	
 PRINT_MAP_P2:				
 	addi a1,a1,16
 	li t0,320
@@ -100,33 +107,216 @@ PRINT_MAP_NL:
 	j PRINT_MAP_P2
 	
 
+CAVE_MANAGER:
+	la t0 link_pos
+	li t1,144
+	sh t1,0(t0)
+	li t1,208
+	sh t1,2(t0)
 	
-# a0 -> 0 se for 
+	la s0, secreta
+	addi s0,s0,8 # comeco do trem
+	li a1,0	     # x inicial do print
+	li a2,64     # y inicial do print
+	li s1,0
 	
+PRINT_CAVE_LOOP:
+
+	la a0, game_tiles
+	# a1 ja e definido
+	# a2 ja e definido
+	# a3 e fixo
+	li a4,16 # tamanho do trem
+	lb a6,0(s0) # o tile q vai printar
 	
-MAP_TRANSITION_ANIMATION:
+	call PRINT_SPRITE
+	
+	addi s0,s0,1
+	
+	addi a1,a1,16
+	li t0,320
+	bne a1,t0,PRINT_CAVE_LOOP
+			#caso esteja no fim da linha, muda pro comeco da proxima
+	addi a2,a2,16
+	mv a1, zero
+	
+	li t0, 240
+	blt a2,t0,PRINT_CAVE_LOOP
+	
+	b RETURN_FROM_PRINT_MAP
+
+	
+# a0 = 0 se for pra baixo(esquerda) , 1 se for pra cima(direita)  y
+# a1 dps vai indicar a direcao 0 pra vertical e 1 pra horizontal
+# tempo de frame = 17ms
 
 
+MAP_TRANSITION:
+
+	
+	mv a3,s0 # bota o frame em a3 antes de botar s0 na pilha
+	li t0,1
+
+	addi sp,sp,-28
+	sw ra,0(sp)
+	sw s0,4(sp)
+	sw s1,8(sp)
+	sw s2,12(sp)
+	sw s3,16(sp)
+	sw s4,20(sp)
+	sw s5,24(sp)
+	mv s4,a0	
+	mv s5,a1
+	
+	beq s1,t0,CAVE_MANAGER
+	
+	la s0, teste_mapa_tilemap 	# s0 tem o endereco do tile map (na teoria pq ta dando ruim)
+	lw s1, 0(s0)   			# largura do mapa inteiro, necessario para pular mudar y do mapa
+	
+	addi s0,s0,8  			# atualiza o endereco do s0 pro primeiro que contem info 
+	
+	la t0, camera
+	lb t1,0(t0)	#x
+	lb t2,1(t0)	#y
+	add s0,s0,t1
+	mul t2,t2,s1
+	add s0,s0,t2
+	
+	
+	li a1,0	    	# x inicial do print
+	li a2,64    	# y inicial do print
+	mv s2,zero   	# contador de tiles por linha (max = 20)
+	
+	li s3,0 	# contador de frame
+	
+	
+MAP_TRANSITION_VERTICAL_PRINT:
+	
+	la a0, game_tiles
+	# a1 ja e definido
+	# a2 ja e definido
+	# a3 e fixo
+	li a4,16 # tamanho do trem
+	lb a6,0(s0) # o tile q vai printar
+	
+	call PRINT_SPRITE
+	
+  	
+	addi s0,s0,1
+	addi s2,s2,1
+	li t0, 20
+	beq s2,t0,PRINT_MAP_TRANSITION_VERTICAL_NL
+	
+MAP_TRANSITION_VERTICAL_PRINT_P2:				
+	addi a1,a1,16
+	li t0,320
+	bne a1,t0,MAP_TRANSITION_VERTICAL_PRINT
+			#caso esteja no fim da linha, muda pro comeco da proxima
+	addi a2,a2,16
+	mv a1, zero
+	
+	li t0, 240
+	blt a2,t0,MAP_TRANSITION_VERTICAL_PRINT
+	
+
+
+MAP_TRANSITION_VERTICAL_NEXT_RET:
+	addi s3,s3,1
+	
+	#tira os valores da pilha, e volta para o game_loop
+	la s0, teste_mapa_tilemap 	# s0 tem o endereco do tile map (na teoria pq ta dando ruim)
+	lw s1, 0(s0)   			# largura do mapa inteiro, necessario para pular mudar y do mapa
+	addi s0,s0,8 
+	
+	la t0, camera
+	lb t1,0(t0)	#x
+	lb t2,1(t0)	#y
+	
+	beq s5,zero,transicao_vertical
+	# horizontal
+	li t3,20
+	beq s4,zero,transicao_esquerda
+	add t1,t1,s3
+	b proximo
+transicao_esquerda:
+	sub t1,t1,s3
+	b proximo
+transicao_vertical:
+	li t3,11
+	beq s4,zero,transicao_baixo
+	sub t2,t2,s3
+	b proximo
+transicao_baixo:
+	add t2,t2,s3
+proximo:	
+	add s0,s0,t1
+	mul t2,t2,s1
+	add s0,s0,t2
+	
+	
+	li a0 100
+	li a7,32
+	ecall
+	
+	li a1,0	    	# x inicial do print
+	li a2,64    	# y inicial do print
+	mv s2,zero   	# contador de tiles por linha (max = 20)
+	
+	blt s3,t3,MAP_TRANSITION_VERTICAL_PRINT
+	mv a0,s3
+	li a7,1
+	ecall
+	# pra proxima loc
+	la t0, camera # camera ja ta em t0
+	lb t1,0(t0)	#x
+	lb t2,1(t0)	#y
+	
+	beq s5,zero,poxima_loc_vertical
+	
+	beq s4,zero,proxima_loc_esquerda
+	
+	add t1,t1,s3
+	sb t1,0(t0)
+	b transicao_fim_ret
+
+proxima_loc_esquerda:
+	sub t1,t1,s3
+	sb t1,0(t0)
+	B transicao_fim_ret
+	
+poxima_loc_vertical:
+	beq s4,zero proxima_loc_baixo
+	sub t2,t2,s3
+	sb t2,1(t0)
+	b transicao_fim_ret
+
+proxima_loc_baixo:
+	add t2,t2,s3
+	sb t2,1(t0)
+transicao_fim_ret:	
+	
+	lw ra,0(sp)
+	lw s0,4(sp)
+	lw s1,8(sp)
+	lw s2,12(sp)
+	lw s3,16(sp)
+	lw s4,20(sp)
+	lw s5,24(sp)
+	addi sp,sp,28
+	
 	ret
 	
 	
-
-CAVE_MANAGER:
+PRINT_MAP_TRANSITION_VERTICAL_NL:
 	
-
-
-
-
-
-
-
-
-
-
+	add s0,s0,s1
+	sub s0,s0,s2  # mesma logica do print tile pra achar primeiro da proxima linha
+	mv s2,zero    # reseta contador da linha
+	j MAP_TRANSITION_VERTICAL_PRINT_P2
+	
 
 
 
 
 		
-				
 	
