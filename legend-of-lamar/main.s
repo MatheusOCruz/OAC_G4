@@ -8,10 +8,13 @@ j GAME_PREP
 
 link_pos: .half 128,144   # pos do link na tela y/x
 link_sprite_num: .byte 5  # char da animacao da andanda
+link_vida: .byte 8
+link_moedas: .half 1000
+link_chaves: .half 15
+link_bombas: .half 3
+map_localtion: .half 2,2  # qual dos mapas na matrix dos tilemaps o bicho ta x/y
 
-map_localtion: .half 0,0  # qual dos mapas na matrix dos tilemaps o bicho ta x/y
-
-general_pos: .half 5,8  #posição do boneco no tilemap
+general_pos: .half 5,8  #posiÃ§Ã£o do boneco no tilemap
 
 
 .data 
@@ -19,6 +22,7 @@ general_pos: .half 5,8  #posição do boneco no tilemap
 .include "./modules/print.s"
 .include "./modules/map_manager.s"
 .include "./modules/music.s"
+.include "./modules/hud_manager.s"
 #.include "SYSTEMv21.s"
 .text	
 #	s0 = frame atual
@@ -71,17 +75,17 @@ GAME_PREP:
 	
 GAME_LOOP:
 	# mantem o jogo em 60 frames 
-	li t0, 16				# Esse � o periodo em ms no qual o frame tem que ficar em tela para manter em 60fps
+	li t0, 16				# Esse é o periodo em ms no qual o frame tem que ficar em tela para manter em 60fps
 	csrr t1, time 			# Carrega o tempo atual
 	sub t1, t1, s11 			# Subtrai o tempo atual do tempo do ultimo frame
 	ble t1,t0, GAME_LOOP 	# se o tempo do ultimo frame for menor que 16 volta pro inicio do loop
 	
 	# limite de notas da musica
 	la t0, CURRENT_NOTE_DURATION		# So toca uma nota nova passados o tempo da ultima
-	lw t0, 0(t0)						# Carrega o valor da dura��o da nota
+	lw t0, 0(t0)						# Carrega o valor da duração da nota
 	csrr t1, time 						# Carrega o tempo atual
 	sub t1, t1, s9 						# Subtrai o tempo atual do tempo da ultima nota
-	ble t1, t0, NAO_TOCA				# N�o toca se n passou 500 ms
+	ble t1, t0, NAO_TOCA				# Não toca se n passou 500 ms
 	call MUSIC_PLAY					# Toca a nota
 	csrr s9, time						# Salva o tempo da ultima nota em s10
 NAO_TOCA:
@@ -89,7 +93,7 @@ NAO_TOCA:
 	
 	xori s0,s0,1  # troca frame
 	call MAP_MANAGER 
-	
+	#call HUD_MANAGER (algo ta quebrado :( )
 	# carrega o link no frame
 	la a0,link_walk
 	la t0, link_sprite_num 
