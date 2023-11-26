@@ -1,29 +1,34 @@
 .data
-#.include "MACROSv21.s"
+.include "modules/MACROSv21.s"
 .text
 j GAME_PREP
 	
 .data
 
-
-link_pos: .half 128,144   # pos do link na tela y/x
+link_pos: .half 128,144   # pos do link na tela (x,y)
 link_sprite_num: .byte 5  # char da animacao da andanda
 link_vida: .byte 8
-link_moedas: .half 1000
+link_moedas: .half 100
 link_chaves: .half 15
 link_bombas: .half 3
-map_localtion: .half 2,2  # qual dos mapas na matrix dos tilemaps o bicho ta x/y
+map_location: .byte 2,2  # qual dos mapas na matrix dos tilemaps o bicho ta (x,y)
+arma_a: .byte 0
+arma_b: .byte 0		  # depois tem q definir o id de cada arma pra fazer isso
+general_pos: .half 5,8 
 
-general_pos: .half 5,8  #posiÃ§Ã£o do boneco no tilemap
+# 0 1 2 3 
+# w s a d
+atacando: .byte 0,0	  # famoso remendo pro frame de ataque, direcao do ataque 
+
 
 
 .data 
-.include "./modules/input.s"
-.include "./modules/print.s"
-.include "./modules/map_manager.s"
-.include "./modules/music.s"
-.include "./modules/hud_manager.s"
-#.include "SYSTEMv21.s"
+.include "modules/input.s"
+.include "modules/print.s"
+.include "modules/map_manager.s"
+.include "modules/music.s"
+.include "modules/hud_manager.s"
+.include "modules/SYSTEMv21.s"
 .text	
 #	s0 = frame atual
 #
@@ -93,7 +98,7 @@ NAO_TOCA:
 	
 	xori s0,s0,1  # troca frame
 	call MAP_MANAGER 
-	#call HUD_MANAGER (algo ta quebrado :( )
+	call HUD_MANAGER #(algo ta quebrado :( )
 	# carrega o link no frame
 	la a0,link_walk
 	la t0, link_sprite_num 

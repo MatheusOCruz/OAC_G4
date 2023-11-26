@@ -6,6 +6,8 @@
 .include "../assets/tiles/link_walk.data"
 .include "../assets/tiles/link_atack_down.data"
 .include "../assets/tiles/tiles_tela_1.data"
+.include "../assets/tiles/secreta.data"
+
 .text
 
 PRINT:

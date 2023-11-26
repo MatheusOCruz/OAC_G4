@@ -1,7 +1,7 @@
 
 .data
 
-.include "tiles/teste_mapa_tilemap.data"
+.include "../assets/tiles/teste_mapa_tilemap.data"
 x_inicial: .byte 0
 y_inicial: .byte 64
 camera:	   .byte 40,22

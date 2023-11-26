@@ -1,6 +1,6 @@
 .data 
 
-.include "tiles/vida.data"
+.include "../assets/tiles/vida.data"
 
 pos_vida  : .half 224,36 # (x,y)
 pos_moedas: .half 136,20 # (x,y)
@@ -117,7 +117,7 @@ PRINT_BOMBAS_2:
 	
 # falta as 2 arminhas 
 
-FIM:
+PRINT_ARMASl:
 	
 	
 	ret
