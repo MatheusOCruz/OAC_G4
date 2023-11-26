@@ -10,15 +10,6 @@ GET_INPUT_MENU:
   		
 
 GET_INPUT:	
-	la t0,map_location  		#em qual dos mapas o link ta
-	lb t1,0(t0)			#x
-	lb t2,1(t0)			#y
-	li t3,20			#tamanho x de uma tela
-	mul t3,t1,t3			#tamanho da tela vezes numero de telas
-	li t4,660			#tamanho y da tela
-	mul t4,t2,t4			#tamanho em y vezes o numero de telas
-	add a1,t3,t4			#posição do link no mapa geral					
-	
  	li t1,0xFF200000		# carrega o endere?o de controle do KDMMIO
 	lw t0,0(t1)			# Le bit de Controle Teclado
 	andi t0,t0,0x0001 		# mascara o bit menos significativo
@@ -38,35 +29,24 @@ NO_INPUT:
 	ret
 
 MV_UP:	
+	addi sp,sp,-4
+	sw ra,0(sp)
+	li a5,1
+	call CHECK_COLISAO
+	lw ra,0(sp)
+	addi sp,sp,4
 	
+	li t4,0
+	beq a0,t4,TELA_UP   # t5 = -1 e pq passou do limite da tela, troca de mapa 
 	
-	la t0,link_pos
-	la t3,teste_mapa_tilemap
-	addi t3,t3,8 #pegando a matriz da tela e pulando os dados
-	
-	lh t1,2(t0) # eixo y
-	lh t2,0(t0) #eixo x
-	
-	srli t5,t1,4	#ind�ce na matriz em y
-	srli t2,t2,4	#ind�ce na matriz em x
-	addi t5,t5,-5
-	li t4,60        #calculando a posi��o do quadrado de cima do boneco
-	mul t6,t5,t4
-	add t3,t3,t6
-	add t3,t3,t2
-	add t3,t3,a1
-	
-	li t4,-1
-	beq t5,t4,TELA_UP   # t5 = -1 e pq passou do limite da tela, troca de mapa 
-	
-	lb t4,0(t3)	     #pega o valor do quadrado
 	li t5,4
 	beq t4,t5,ENTRA_SAI_CAVERNOSA
-	bne t4,zero,NO_INPUT #se o quadrado n�o for vazio, ignora o input
+
+	bgt a4,zero,NO_INPUT
 	
-	addi t1,t1,-16 
+	addi a2,a2,-16 
 	la t0,link_pos
-	sh t1,2(t0)
+	sh a2,2(t0)
 	
 ANIM_UP:	# para animacao
 	la t0, link_sprite_num  # sprite atual 
@@ -95,37 +75,22 @@ TELA_UP:
 	sb t1,1(t0)
 	ret
 	
-	
-
-	
-	
 
 	
 MV_LEFT:
+	addi sp,sp,-4
+	sw ra,0(sp)
+	li a5,2
+	call CHECK_COLISAO
+	lw ra,0(sp)
+	addi sp,sp,4
+	
+	beq a6,zero,TELA_LEFT
+	bgt a4,zero,NO_INPUT
+	
+	addi a3,a3,-16 
 	la t0,link_pos
-	la t3,teste_mapa_tilemap
-	addi t3,t3,8 #pegando a matriz da dela e pulando os dados
-	
-	lh t1,2(t0) # eixo y
-	lh t2,0(t0) #eixo x
-	
-	srli t1,t1,4	#ind�ce na matriz em y
-	srli t5,t2,4	#ind�ce na matriz em x
-	addi t1,t1,-4
-	li t4,60      #calculando a posi��o do quadrado da esquerda do boneco
-	mul t1,t1,t4
-	add t3,t3,t1
-	add t3,t3,t5
-	addi t3,t3,-1
-	add t3,t3,a1
-	
-	beq t5,zero,TELA_LEFT
-	
-	lb t3,(t3)	     #pega o valor do quadrado
-	bne t3,zero,NO_INPUT #se o quadrado n�o for vazio, ignora o input
-	
-	addi t2,t2,-16
-	sh t2,0(t0)
+	sh a3,0(t0)
 
 ANIM_LEFT:
  	la t0, link_sprite_num
@@ -170,36 +135,24 @@ MV_DOWN_CAVE_PREP:
 	la t3, secreta
 
 MV_DOWN:
-	addi t3,t3,8 #pegando a matriz da dela e pulando os dados
+	addi sp,sp,-4
+	sw ra,0(sp)
+	li a5,3
+	call CHECK_COLISAO
+	lw ra,0(sp)
+	addi sp,sp,4
 	
-	lh t2,0(t0) #eixo X
-	lh t1,2(t0) # eixo Y
+	li t4,10
+	beq a0,t4,TELA_DOWN   # t5 = -1 e pq passou do limite da tela, troca de mapa 
 	
-	srli t5,t1,4	#ind�ce na matriz em y
-	srli t2,t2,4	#ind�ce na matriz em x
-	addi t5,t5,-3
-	li t4,60      #calculando a posi��o do quadrado de baixo do boneco
-	mul t6,t5,t4
-	add t3,t3,t6
-	add t3,t3,t2
-	add t3,t3,a1
-	
-	li t4, 11
-	beq t4,t5,TELA_DOWN
-	
-# t3 deve conter o endereco do trem
-	
-	lb t3,(t3)	     #pega o valor do quadrado
-	li t5,6
-	mv a0,t3
-	li a7,1
-	ecall
-	beq t3,t5,ENTRA_SAI_CAVERNOSA
-	bne t3,zero,NO_INPUT #se o quadrado n�o for vazio, ignora o input
-	
-	addi t1,t1,16
-	sh t1,2(t0)
+	li t5,4
+	beq t4,t5,ENTRA_SAI_CAVERNOSA
 
+	bgt a4,zero,NO_INPUT
+	
+	addi a2,a2,16 
+	la t0,link_pos
+	sh a2,2(t0)
  	
 	
 	
@@ -230,31 +183,21 @@ TELA_DOWN:
 	ret
 
 MV_RIGHT:
-	la t0,link_pos
-	la t3,teste_mapa_tilemap
-	addi t3,t3,8 #pegando a matriz da dela e pulando os dados
+	addi sp,sp,-4
+	sw ra,0(sp)
+	li a5,4
+	call CHECK_COLISAO
+	lw ra,0(sp)
+	addi sp,sp,4
 	
-	lh t1,2(t0) # eixo Y
-	lh t2,0(t0) #eixo x
-	
-	srli t1,t1,4    #ind�ce na matriz em y
-	srli t5,t2,4	#ind�ce na matriz em x
-	addi t1,t1,-4
-	li t4,60      
-	mul t1,t1,t4
-	add t3,t3,t1
-	add t3,t3,t5
-	addi t3,t3,1  #calculando a posi��o do quadrado da direita do boneco
-	add t3,t3,a1
+	li t0,19
+	beq a6,t0,TELA_RIGHT
 
-	li t4,19
-	beq t5,t4,TELA_RIGHT
+	bgt a4,zero,NO_INPUT
 	
-	lb t3,(t3)	     #pega o valor do quadrado
-	bne t3,zero,NO_INPUT #se o quadrado n�o for vazio, ignora o input
-	
-	addi t2,t2,16
-	sh t2,0(t0)
+	addi a3,a3,16 
+	la t0,link_pos
+	sh a3,0(t0)
 
  	
 
