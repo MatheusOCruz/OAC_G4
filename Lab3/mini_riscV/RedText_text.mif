@@ -1,0 +1,23 @@
+DEPTH = 16384;
+WIDTH = 32;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+CONTENT
+BEGIN
+00000000 : 01000293;   % 7: addi t0,zero,0x10   # t0 = 0x10 %
+00000001 : 00528333;   % 8: add t1,t0,t0        # t1 = 0x20 %
+00000002 : 405303b3;   % 9: sub t2,t1,t0        # t2 = 0x10 %
+00000003 : 0063ee33;   % 10: or  t3,t2,t1        # t3 = 0x30 %
+00000004 : 01c3feb3;   % 11: and t4,t2,t3        # t4 = 0x10 %
+00000005 : 01ceaf33;   % 12: slt t5,t4,t3        # t5 = 0x01 %
+00000006 : 01de2433;   % 13: slt s0,t3,t4        # s0 = 0x00 %
+00000007 : ff0e0493;   % 14: addi s1,t3,-16      # s1 = 0x20 %
+00000008 : 001f7913;   % 15: andi s2,t5,1        # s2 = 0x01 %
+00000009 : 00106993;   % 16: ori s3,zero,1       # s3 = 0x01 %
+0000000a : 00104a13;   % 17: xori s4,zero,1      # s4 = 0x01 %
+0000000b : 014a4ab3;   % 18: xor s5,s4,s4        # s5 = 0x00 %
+0000000c : 00000463;   % 21:   beq zero,zero LabelJal %
+0000000d : 0ff00b13;   % 22:   addi s6,zero,0xff # se isso aqui rodar deu ruim %
+0000000e : ff9ff0ef;   % 25:   jal LabelBeq %
+0000000f : 0ff00b93;   % 27:   addi s7,zero,0xff # se isso aqui rodar deu ruim  %
+END;
