@@ -1,0 +1,162 @@
+
+module Uniciclo (
+	input wire clockCPU, clockMem,
+	input wire reset,
+	output reg [31:0] Pc,
+	output reg [31:0] Instr,
+	input  wire[4:0] regin,
+	output reg [31:0] regout,
+	output wire [31:0] Instruction,RegAData,RegBdata, ResuladoUla
+	);
+	
+	
+	initial
+		begin
+			Pc<=32'h0040_0000;
+			Instr<=32'b0;
+			regout<=32'b0;
+		end
+		
+
+// Aqui vai o seu código do processador
+		wire [31:0] NextPc;
+
+		wire [31:0] instrucao;
+		//saidas reg
+		wire [31:0] read_data1;
+		wire [31:0] read_data2;
+		// segunda entrada da ula
+		wire [31:0] reg2_or_imm;
+		
+		wire [31:0] ula_or_mem;
+		wire [31:0] write_reg_data;
+		
+		
+		//imediato gerado
+		wire [31:0] imm;
+		// saida memoria de dados
+		wire [31:0] dados_mem;
+		
+		//saida alu control
+		wire [4:0] ALUCtrl;
+		
+		//saidas control
+		wire beq;
+		wire Branch;
+		wire MemRead;
+		wire MemToReg;
+		wire [1:0] ALUOp;
+		wire MemWrite;
+		wire ALUSrc;
+		wire reg_write;
+		wire jal0;
+		wire jal1;
+		
+		
+		wire beq_or_jal;
+		
+		//saidas ula
+		wire zero;
+		wire [31:0] alu_result;
+		
+		
+		
+		
+		assign beq_or_jal  = (Branch & zero) | jal0;
+		assign Instruction = instrucao;
+		assign RegAData 	 = read_data1;
+		assign RegBdata    = read_data2;
+		assign ResuladoUla = alu_result;
+		
+	
+		
+		banco_registradores banco_reg_inst(
+		.clock(clockCPU),
+		.read_register1(instrucao[19:15]),
+		.read_register2(instrucao[24:20]),
+		.regin(regin),
+		.write_register(instrucao[11:7]),
+		.write_data(write_reg_data),
+		.reg_write(reg_write),
+		.read_data1(read_data1),
+		.read_data2(read_data2),
+		.regout(regout)
+		);
+		
+		
+		imm_gen imm_gen_inst(
+			.instrucao(instrucao),
+			.imm(imm)
+			);
+			
+		
+		alu_control ALUC1(
+			.funct10({instrucao[14:12],instrucao[31:25]}), //supondo q func 3 vem antes do 7
+			.ALUOp(ALUOp),
+			.ALUCtrl(ALUCtrl)
+			);
+			
+			
+		
+		alu ULA1( 
+			.ALUCtrl(ALUCtrl),
+			.entrada1(read_data1),
+			.entrada2(reg2_or_imm),
+			.result(alu_result),
+			.zero(zero)
+			);
+			
+		
+		
+		memoria_instruct mem_instruct_inst(
+		.address(Pc[11:2]),
+		.clock(clockMem),
+		.data(32'd0),
+		.wren(1'd0), // nao escreve na rom 
+		.q(instrucao)
+	);
+	
+		data_mem mem_data_inst(
+		.address(alu_result[11:2]),
+		.clock(clockMem),
+		.data(read_data2),
+		.wren(MemWrite),
+		.q(dados_mem)
+		);
+
+		
+		
+		control control_inst(
+			.opcode(instrucao[6:0]),
+			.Branch(Branch),
+			.MemRead(MemRead),
+			.MemToReg(MemToReg),
+			.ALUOp(ALUOp),
+			.MemWrite(MemWrite),
+			.ALUSrc(ALUSrc),
+			.RegWrite(reg_write),
+			.jal0(jal0),
+			.jal1(jal1)
+			);
+
+			
+		always @* begin
+			Instr <= instrucao;
+			
+			reg2_or_imm <= ALUSrc   ?  imm : read_data2;
+			ula_or_mem  <= MemToReg ? dados_mem : alu_result;
+			
+			write_reg_data <= jal1 ? Pc : ula_or_mem;
+			
+		   NextPc <= beq_or_jal ? Pc + imm : Pc + 32'd4;
+			
+		end
+		
+		always @(posedge clockCPU) begin
+			Pc <= NextPc;
+		end
+		
+
+			
+			
+endmodule
