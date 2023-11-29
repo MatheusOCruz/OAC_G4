@@ -325,14 +325,21 @@ NAO_COLIDE:
 CHAO:
 	#pega 4 numeros aleatorio, soma e subtrai eles da posiçao da nave pra aleatorizar a pozição quando erra
 	#t1,t2,sao numeros aleatorios
-	la t0,nave_posx
+REDO2:	la t0,nave_posx
 	
-	li a7,42
+	li a7,41
 	li a0,0
 	li a1 6
 	ecall
+	srli a0,a0,28
+	bgt a0,a1,REDO2
+	blt a0,zero,REDO2
 	mv t1,a0
+	
 	ecall
+	srli a0,a0,28
+	bgt a0,a1,REDO2
+	blt a0,zero,REDO2
 	mv t2,a0
 	 li t3, 3
 	
