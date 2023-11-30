@@ -2,9 +2,10 @@
 
 .include "seno.data"
 angulo: .byte 48
-velocidade: .half 50
+velocidade: .word 100
 G: .float 4.905
 nave_posx: .word 0,0 #x/y
+teste: .string "\n"
 
 
 
@@ -24,20 +25,20 @@ NAVE_SETUP:
 	
 	li a7, 41
 	li a0,0
+	li a1, 160  #pega numero aleatorio
 	ecall
-	li a1, 200  #pega numero aleatorio
 	srli a0,a0,24
-	blt a0,zero,NAVE_SETUP
 	bgt a0,a1,NAVE_SETUP
+	blt a0,zero,NAVE_SETUP
 	sw a0,4(t1)
 	
 REDO:
 	li a0,0
-	li a1,200
+	li a1,260
 	ecall
 	srli a0,a0,24
-	blt a0,zero,REDO
 	bgt a0,a1,REDO
+	blt a0,zero,REDO
 	sw a0,0(t1)
 	
 LOOP:
@@ -51,7 +52,6 @@ PRINT_NAVE_SETUP:
 	la t0,nave_posx  #pegando os dados que precisa pra printar a nave
 	lw t1,4(t0)   #y da nave
 	lw t2,0(t0)   #x da nave
-	slli t2,t2,2  #alinha x com a word
 	li t3,320
 	mul t1,t1,t3  #pula y linhas
 	add t1,t1,t2
@@ -133,20 +133,20 @@ BAIXO:
 
 FORTE:
 	la t0,velocidade  #aumenta força
-	lh t2,0(t0)
+	lw t2,0(t0)
 	li t1,255
 	beq t1,t2,LOOP
 	addi t2,t2,1
-	sh t2,0(t0)
+	sw t2,0(t0)
 	li a2,50
 	ret
 
 FRACO:
 	la t0,velocidade  #diminui força
-	lh t2,0(t0)
+	lw t2,0(t0)
 	beq zero,t2,LOOP
 	addi t2,t2,-1
-	sh t2,0(t0)
+	sw t2,0(t0)
 	li a2 50
 	ret
 
@@ -156,7 +156,7 @@ NO_INPUT:
 
 PRINT_LINE_DATA:
 	la t1,velocidade 
-	lh a0,0(t1)  #a0 = velocidade atual
+	lw a0,0(t1)  #a0 = velocidade atual
 	srli a0,a0,2
 	fcvt.s.w fa1,a0
 	
@@ -207,7 +207,7 @@ TIRO_PREP:
 	ecall	
 	
 	la t1,velocidade
-	lh t0,0(t1)
+	lw t0,0(t1)
 	fcvt.s.w ft0,t0  #ft0 = velocidade
 	
 	la t1,angulo 
@@ -305,10 +305,10 @@ LIMPA:
 COLISAO: #a0 = pos x, a1 = pos 240 - y
 	la t0,nave_posx
 	lw t1,0(t0) #t1 = nave x0
-	slli t1,t1,2
 	lw t2,4(t0)  #t2 = nave y0
 	li t3,240
 	sub t3,t3,a1
+	
 	blt a0,t1,NAO_COLIDE
 	addi t1,t1,2
 	bgt a0,t1,NAO_COLIDE
@@ -325,23 +325,24 @@ NAO_COLIDE:
 CHAO:
 	#pega 4 numeros aleatorio, soma e subtrai eles da posiçao da nave pra aleatorizar a pozição quando erra
 	#t1,t2,sao numeros aleatorios
-REDO2:	la t0,nave_posx
+	la t0,nave_posx
 	
 	li a7,41
 	li a0,0
 	li a1 6
 	ecall
 	srli a0,a0,28
-	bgt a0,a1,REDO2
-	blt a0,zero,REDO2
+	bgt a0,a1,CHAO
+	blt a0,zero,CHAO
 	mv t1,a0
-	
+
+REDO2:	
 	ecall
 	srli a0,a0,28
 	bgt a0,a1,REDO2
 	blt a0,zero,REDO2
 	mv t2,a0
-	 li t3, 3
+	li t3, 3
 	
 	sub t1,t1,t3
 	sub t2,t2,t3
