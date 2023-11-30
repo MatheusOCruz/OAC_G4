@@ -10,6 +10,9 @@ GET_INPUT_MENU:
   		
 
 GET_INPUT:	
+	la t0,atacando
+	lb t0,0(t0)
+	bne t0,zero, NO_INPUT
  	li t1,0xFF200000		# carrega o endere?o de controle do KDMMIO
 	lw t0,0(t1)			# Le bit de Controle Teclado
 	andi t0,t0,0x0001 		# mascara o bit menos significativo
@@ -23,15 +26,28 @@ GET_INPUT:
 	beq t0,t2,MV_DOWN_START
 	li t0,'d'
 	beq t2,t0,MV_RIGHT
+	li t0,'x'
+	beq t2,t0,ATACK_1
+	
 			
 NO_INPUT:
 		
 	ret
-
+ATACK_1:
+	la t0, atacando
+	li t1,1
+	sb t1,0(t0)
+	ret
+	
 MV_UP:	
 	addi sp,sp,-4
 	sw ra,0(sp)
+	# direcao do ataque
+	la t0, atacando
+	li t1, 0
+	sb t1,1(t0)
 	li a5,1
+	
 	call CHECK_COLISAO
 	lw ra,0(sp)
 	addi sp,sp,4
@@ -80,6 +96,11 @@ TELA_UP:
 MV_LEFT:
 	addi sp,sp,-4
 	sw ra,0(sp)
+	#direcao do ataque
+	la t0, atacando
+	li t1, 2
+	sb t1,1(t0)
+	
 	li a5,2
 	call CHECK_COLISAO
 	lw ra,0(sp)
@@ -137,6 +158,11 @@ MV_DOWN_CAVE_PREP:
 MV_DOWN:
 	addi sp,sp,-4
 	sw ra,0(sp)
+	#direcao do ataque
+	la t0, atacando
+	li t1, 1
+	sb t1,1(t0)
+
 	li a5,3
 	call CHECK_COLISAO
 	lw ra,0(sp)
@@ -185,6 +211,11 @@ TELA_DOWN:
 MV_RIGHT:
 	addi sp,sp,-4
 	sw ra,0(sp)
+	#direcao do ataque
+	la t0, atacando
+	li t1, 3
+	sb t1,1(t0)
+	
 	li a5,4
 	call CHECK_COLISAO
 	lw ra,0(sp)

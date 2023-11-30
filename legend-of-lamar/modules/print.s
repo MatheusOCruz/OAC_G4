@@ -4,7 +4,6 @@
 .include "../assets/tiles/zelda_hud.data"
 .include "../assets/tiles/link_teste.data"
 .include "../assets/tiles/link_walk.data"
-.include "../assets/tiles/link_atack_down.data"
 .include "../assets/tiles/tiles_tela_1.data"
 .include "../assets/tiles/secreta.data"
 

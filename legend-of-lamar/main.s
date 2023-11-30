@@ -16,10 +16,11 @@ arma_a: .byte 0
 arma_b: .byte 0		  # depois tem q definir o id de cada arma pra fazer isso
 general_pos: .half 5,8 
 
+
+atacando: .byte 0,0	  #frame de ataque
 # 0 1 2 3 
 # w s a d
-atacando: .byte 0,0	  # famoso remendo pro frame de ataque, direcao do ataque 
-
+direcao:  .byte 0 	# direaco
 
 
 .data 
@@ -105,14 +106,7 @@ NAO_TOCA:
 	lb t0,0(t0)
 	mv a6,t0    		# a6 tem qual sprite da animacao o homi ta
 	
-	la t0,link_pos
-	lh a1,0(t0) 		# x do link
-	lh a2,2(t0) 		# y do link
-	mv a3,s0    		# carrega o frame atual
-	li a4,16    			# largura do sprite
-	li a5,16    			# futuramente usa altura pq tem sprite com mais de 16 (ataque)
-	mv a7,zero  		# a7 e usado so pelo tilemap
-	call PRINT_SPRITE
+	call UPDATE_LINK
 	
 	# pega input e move o homi
 	li t0,0xFF200604 	# endereco para mudar frame
@@ -122,3 +116,6 @@ NAO_TOCA:
 	call GET_INPUT   
 	
 	j GAME_LOOP
+
+.include "modules/link.s"
+.include "modules/colisao.s"
