@@ -1,7 +1,7 @@
 
 .data
 
-.include "../assets/tiles/teste_mapa_tilemap.data"
+.include "../assets/tiles/tilemap_com_dg_temp.data"
 x_inicial: .byte 0
 y_inicial: .byte 64
 camera:	   .byte 40,22
@@ -114,7 +114,7 @@ CAVE_MANAGER:
 	li t1,208
 	sh t1,2(t0)
 	
-	la s0, secreta
+	la s0, teste_mapa_tilemap
 	addi s0,s0,8 # comeco do trem
 	li a1,0	     # x inicial do print
 	li a2,64     # y inicial do print

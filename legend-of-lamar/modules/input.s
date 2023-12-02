@@ -23,7 +23,7 @@ GET_INPUT:
 	li t0,'a'
 	beq t2,t0,MV_LEFT
 	li t0,'s'
-	beq t0,t2,MV_DOWN_START
+	beq t0,t2,MV_DOWN
 	li t0,'d'
 	beq t2,t0,MV_RIGHT
 	li t0,'x'
@@ -55,14 +55,16 @@ MV_UP:
 	li t4,0
 	beq a0,t4,TELA_UP   # t5 = -1 e pq passou do limite da tela, troca de mapa 
 	
-	li t5,4
-	beq t4,t5,ENTRA_SAI_CAVERNOSA
+
+	
 
 	bgt a4,zero,NO_INPUT
 	
-	addi a2,a2,-16 
+	addi a2,a2,-16
 	la t0,link_pos
-	sh a2,2(t0)
+	lh t1,2(t0)
+	addi t1,t1,-8
+	sh t1,2(t0)
 	
 ANIM_UP:	# para animacao
 	la t0, link_sprite_num  # sprite atual 
@@ -111,7 +113,10 @@ MV_LEFT:
 	
 	addi a3,a3,-16 
 	la t0,link_pos
-	sh a3,0(t0)
+	la t0,link_pos
+	lh t1,0(t0)
+	addi t1,t1,-8
+	sh t1,0(t0)
 
 ANIM_LEFT:
  	la t0, link_sprite_num
@@ -141,19 +146,10 @@ TELA_LEFT:
 	
 
 MV_DOWN_START:
-	la t0,link_pos
 	
-	bne s1,zero,MV_DOWN_CAVE_PREP
-	
-	# depois essa conta pode ser reutilizada pra dungeon
-	la t3,teste_mapa_tilemap
 	
 	b MV_DOWN
 MV_DOWN_CAVE_PREP:
-	li a0,10
-	li a7,1
-	ecall	
-	la t3, secreta
 
 MV_DOWN:
 	addi sp,sp,-4
@@ -168,17 +164,18 @@ MV_DOWN:
 	lw ra,0(sp)
 	addi sp,sp,4
 	
+
 	li t4,10
 	beq a0,t4,TELA_DOWN   # t5 = -1 e pq passou do limite da tela, troca de mapa 
 	
-	li t5,4
-	beq t4,t5,ENTRA_SAI_CAVERNOSA
 
 	bgt a4,zero,NO_INPUT
 	
 	addi a2,a2,16 
 	la t0,link_pos
-	sh a2,2(t0)
+	lh t1,2(t0)
+	addi t1,t1,8
+	sh t1,2(t0)
  	
 	
 	
@@ -228,7 +225,10 @@ MV_RIGHT:
 	
 	addi a3,a3,16 
 	la t0,link_pos
-	sh a3,0(t0)
+	lh t1,0(t0)
+	addi t1,t1,8
+	sh t1,0(t0)
+	
 
  	
 
@@ -264,31 +264,6 @@ TELA_RIGHT:
 ANIM_2:
 	addi t2,t2,1
 	sb t2,0(t0)
-	ret
-	
-ENTRA_SAI_CAVERNOSA:
-	# primeira caverna ta no 2,2
-	
-	li t0,1
-	beq s1,t0,SAI_CAVERNA
-	li s1,1				# como n tem dungeon ainda, tem q estar em uma caverna so n sabe qual ainda
-	
-	la t0, map_location
-	lb t1,0(t0)
-	li t2,2
-	bne t1,t2,CAVERONSA_TESTE_2
-	
-	lb t1,2(t0)
-	bne t1,t2,CAVERONSA_TESTE_2
-					# no caso tem q fazer alguma coisa pra diferenciar as cavernas ainda 
-					# aqui estaria na da tela 2,2
-	ret
-	
-CAVERONSA_TESTE_2:
-	ret
-	
-SAI_CAVERNA:
-	li s1,0
 	ret
 	
 	

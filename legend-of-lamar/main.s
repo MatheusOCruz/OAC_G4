@@ -12,6 +12,7 @@ link_moedas: .half 100
 link_chaves: .half 15
 link_bombas: .half 3
 map_location: .byte 2,2  # qual dos mapas na matrix dos tilemaps o bicho ta (x,y)
+last_map_location: .byte 0,0 # pra voltar na transicao das cavernas
 arma_a: .byte 0
 arma_b: .byte 0		  # depois tem q definir o id de cada arma pra fazer isso
 general_pos: .half 5,8 
@@ -32,7 +33,7 @@ direcao:  .byte 0 	# direaco
 .include "modules/SYSTEMv21.s"
 .text	
 #	s0 = frame atual
-#
+#	s1 = 0 mundo aberto 1 dungeon 2 cavernosa
 #	s9 = temporizador pra musica
 #	s11 = temporizador pros frames
 
@@ -77,7 +78,7 @@ GAME_PREP:
 	fcvt.s.w ft0, t0 
 	fcvt.s.w ft1, t1 
 	fdiv.s fs11, ft0, ft1      #tempo do frame (1000/60)
-	
+	li s1,0			   # comeca no mundo aberto
 	
 GAME_LOOP:
 	# mantem o jogo em 60 frames 
