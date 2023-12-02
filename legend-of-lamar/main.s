@@ -1,5 +1,6 @@
 .data
 .include "modules/MACROSv21.s"
+
 .text
 j GAME_PREP
 	
@@ -9,31 +10,38 @@ link_pos: .half 128,144   # pos do link na tela (x,y)
 link_sprite_num: .byte 5  # char da animacao da andanda
 link_vida: .byte 8
 link_moedas: .half 100
-link_chaves: .half 15
+link_cafezin: .half 15
 link_bombas: .half 3
 map_location: .byte 2,2  # qual dos mapas na matrix dos tilemaps o bicho ta (x,y)
 last_map_location: .byte 0,0 # pra voltar na transicao das cavernas
 arma_a: .byte 0
 arma_b: .byte 0		  # depois tem q definir o id de cada arma pra fazer isso
+dano_items: .byte 0,0,20,0,5,10 # 0 nao sao itens, depende do id
 general_pos: .half 5,8 
 
+item_counter: .byte 0	#quantidade de itens na tela atual 
+enemy_counter: .byte 0	# quantidade de inimigos na tela atual
 
+	 
 atacando: .byte 0,0	  #frame de ataque
 # 0 1 2 3 
 # w s a d
-direcao:  .byte 0 	# direaco
+direcao:  .byte 0 	# direcao que o jovem ta durante o ataque
+arma_do_ataque: .byte 0 # 0 -> arma a (x) , 1 -> arma b (z)
 
-
-.data 
+.text	
 .include "modules/input.s"
 .include "modules/print.s"
 .include "modules/map_manager.s"
 .include "modules/music.s"
 .include "modules/hud_manager.s"
+
 .include "modules/SYSTEMv21.s"
-.text	
+
 #	s0 = frame atual
 #	s1 = 0 mundo aberto 1 dungeon 2 cavernosa
+#	s7 = usado pelo item manager 
+#	s8 = usado pelo enemy_manager
 #	s9 = temporizador pra musica
 #	s11 = temporizador pros frames
 
@@ -101,6 +109,7 @@ NAO_TOCA:
 	xori s0,s0,1  # troca frame
 	call MAP_MANAGER 
 	call HUD_MANAGER #(algo ta quebrado :( )
+	call ITEM_MANAGER
 	# carrega o link no frame
 	la a0,link_walk
 	la t0, link_sprite_num 
@@ -117,6 +126,9 @@ NAO_TOCA:
 	call GET_INPUT   
 	
 	j GAME_LOOP
+	
 
+	
+.include "modules/item_manager.s"
 .include "modules/link.s"
 .include "modules/colisao.s"
