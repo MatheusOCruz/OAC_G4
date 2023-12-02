@@ -87,8 +87,12 @@ CALCULA_ESQUERDA:
 		
 		
 cavernosa:
-	
-	# primeiro decide onde ta, mapa/dungeon/cavern
+	addi sp,sp,-4
+	sw ra,0(sp)
+	call CLEAR_ITEMS
+	lw ra,0(sp)
+	addi sp,sp,4
+	#  decide onde ta, mapa/dungeon/caverna
 	li t0,1 
 	beq s1,t0, TA_NA_DUNGEON
 	bne s1,zero, TA_NA_CAVERNOSA
@@ -124,7 +128,13 @@ cavernosa:
 	sh t1,2(t0)
 	
 	li s1,2 # indica que ta na caverna
-	ret
+	
+	# nessa sala tem a espada de madeira pra pickup
+	li a0,4 	# id da espada
+	li a1,128	# x q a espada aparece
+	li a2,144 	# y que a espada aparece
+	
+	tail ADD_ITEM # nao faz mais nada aqui, pode dar return de dentro do add
 	
 
 cavernosa_teste2:
