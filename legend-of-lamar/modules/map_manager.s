@@ -20,6 +20,14 @@ camera:	   .byte 40,22
 # a2 = coluna
 # sempre 176 tiles no caso nao pq vou ter q mudar a resolucao mas faz parte
 MAP_MANAGER:
+	la t0,anim_frame
+	lw t1,0(t0) 		#tempo da ultima animação
+	csrr t2,time		#tempo atual
+	sub t3,t2,t1		#diferença de tempo
+	li t4,400		#duração de um frame da animaçao
+	slt t3,t3,t4		#t3 = 1 se tiver passado tempo suficiente
+	xori t3,t3,1
+	sw t3,4(t0)		#salva t3 na memoria
 	
 	mv a3,s0 # bota o frame em a3 antes de botar s0 na pilha
 	li t0,1
@@ -65,6 +73,9 @@ PRINT_MAP_LOOP:
 	li a4,16 # tamanho do trem
 	lb a6,0(s0) # o tile q vai printar
 	
+	tail ANIMA_ESTATICO
+VOLTA_ESTATICO:
+
 	call PRINT_SPRITE
 	
   	
