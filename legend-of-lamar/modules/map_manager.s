@@ -30,8 +30,6 @@ MAP_MANAGER:
 	sw s1,8(sp)
 	sw s2,12(sp)
 	
-	beq s1,t0,CAVE_MANAGER
-	
 	la s0, teste_mapa_tilemap 	# s0 tem o endereco do tile map (na teoria pq ta dando ruim)
 	lw s1, 0(s0)   			# largura do mapa inteiro, necessario para pular mudar y do mapa
 	
@@ -107,43 +105,6 @@ PRINT_MAP_NL:
 	j PRINT_MAP_P2
 	
 
-CAVE_MANAGER:
-	la t0 link_pos
-	li t1,144
-	sh t1,0(t0)
-	li t1,208
-	sh t1,2(t0)
-	
-	la s0, teste_mapa_tilemap
-	addi s0,s0,8 # comeco do trem
-	li a1,0	     # x inicial do print
-	li a2,64     # y inicial do print
-	li s1,0
-	
-PRINT_CAVE_LOOP:
-
-	la a0, game_tiles
-	# a1 ja e definido
-	# a2 ja e definido
-	# a3 e fixo
-	li a4,16 # tamanho do trem
-	lb a6,0(s0) # o tile q vai printar
-	
-	call PRINT_SPRITE
-	
-	addi s0,s0,1
-	
-	addi a1,a1,16
-	li t0,320
-	bne a1,t0,PRINT_CAVE_LOOP
-			#caso esteja no fim da linha, muda pro comeco da proxima
-	addi a2,a2,16
-	mv a1, zero
-	
-	li t0, 240
-	blt a2,t0,PRINT_CAVE_LOOP
-	
-	b RETURN_FROM_PRINT_MAP
 
 	
 # a0 = 0 se for pra baixo(esquerda) , 1 se for pra cima(direita)  y
@@ -167,8 +128,6 @@ MAP_TRANSITION:
 	sw s5,24(sp)
 	mv s4,a0	
 	mv s5,a1
-	
-	beq s1,t0,CAVE_MANAGER
 	
 	la s0, teste_mapa_tilemap 	# s0 tem o endereco do tile map (na teoria pq ta dando ruim)
 	lw s1, 0(s0)   			# largura do mapa inteiro, necessario para pular mudar y do mapa

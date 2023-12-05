@@ -22,18 +22,20 @@ GET_INPUT:
   	beq t2,t0,MV_UP
 	li t0,'a'
 	beq t2,t0,MV_LEFT
-	li t0,'s'
-	beq t0,t2,MV_DOWN
-	li t0,'d'
-	beq t2,t0,MV_RIGHT
 	li t0,'x'
 	beq t2,t0,ATACK_1
 	
-			
+	tail GET_INPUT_PART_2
+	
+
+	
 NO_INPUT:
-		
 	ret
+
+
 ATACK_1:
+	la t0, arma_a
+	lb s6, 0(t0)
 	la t0, atacando
 	li t1,1
 	sb t1,0(t0)
@@ -143,13 +145,17 @@ TELA_LEFT:
 	addi t1,t1,-1
 	sb t1,0(t0)
 	ret
-	
 
-MV_DOWN_START:
-	
-	
-	b MV_DOWN
-MV_DOWN_CAVE_PREP:
+GET_INPUT_PART_2:		
+	li t0,'s'
+	beq t0,t2,MV_DOWN
+	li t0,'d'
+	beq t2,t0,MV_RIGHT
+	li t0,'c'
+	beq t0,t2,BEBE_CAFE
+	li t0,'t'
+	beq t0,t2,TESTE	
+	ret
 
 MV_DOWN:
 	addi sp,sp,-4
@@ -266,8 +272,48 @@ ANIM_2:
 	sb t2,0(t0)
 	ret
 	
+BEBE_CAFE:
+	la t0, link_vida
+	lb t3,0(t0)	
+	mv a0,t3
+	li a7,1
+	ecall
+	li t1, 8	#vida cheia
+	beq t3, t1, NAO_BEBE_CAFE
+	la t2, link_cafezin
+	lh t4,0(t2)	# ta sem cafe coitado
+	mv a0,t4
+	ecall
+	beq t4, zero, NAO_BEBE_CAFE
 	
+	addi t3,t3,1
+	addi t4,t4,-1
+	sb t3, 0(t0)	# vida nova do homem
+	sh t4, 0(t2)	# reduz o cafezin
+
+NAO_BEBE_CAFE:	
+	ret
+
+TESTE:
+	la t0, link_vida
+	lb t3,0(t0)	
+	addi t3,t3,-1
+	sb t3,0(t0)
+	ret
 
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	

@@ -1,12 +1,14 @@
 .data 
-
 .include "../assets/tiles/vida.data"
+
 
 pos_vida  : .half 224,36 # (x,y)
 pos_moedas: .half 136,20 # (x,y)
-pos_chaves: .half 136,36 # (x,y)
+pos_cafe: .half 136,36 # (x,y)
 pos_bombas: .half 136,44 # (x,y)
 
+pos_arma_a: .half 188,28
+pos_arma_b: .half 164,28
 
 .text
 # s3 = vida
@@ -54,10 +56,10 @@ VIDA_LOOP_2:
 	bne s0,zero,PRINT_VIDA_LOOP
 	
 	
-	lw ra,0(sp)
-	lw s0,4(sp)
-	lw s1,8(sp)
-	addi sp,sp,12
+	# pra printar os trem no frame certo esse ja volta
+	lw s0,4(sp)	
+	
+	
 	
 	
 	
@@ -80,16 +82,16 @@ PRINT_DINDIN_2:
 	li a7,101
 	ecall
 	
-PRINT_CHAVES:
+PRINT_CAFE:
 
-	la t0,link_chaves
+	la t0,link_cafezin
 	lhu a0,0(t0)
 	li t0,999
-	blt a0,t0,PRINT_CHAVES_2
+	blt a0,t0,PRINT_CAFE_2
 	li a0,999  
 	# tem mais de 999 moedas, mas para o display em 999
-PRINT_CHAVES_2:
-	la t0,pos_chaves
+PRINT_CAFE_2:
+	la t0,pos_cafe
 	lh a1,0(t0)
 	lh a2,2(t0)
 	li a3,255
@@ -117,13 +119,68 @@ PRINT_BOMBAS_2:
 	
 # falta as 2 arminhas 
 
-PRINT_ARMASl:
+
+
+# id da arma -1 -> deslocamento pra leitura no arquivo
+PRINT_ARMA_l:
+	la t0, arma_a
+	lb t0,0(t0)
+	beq t0,zero, PRINT_ARMA_2
+	addi t0,t0,-1
+	la t1,pos_arma_a
+	la a0, items_temp
+	lh a1,0(t1)
+	lh a2,2(t1)
+	mv a3,s0
+	li a4,16
+	mv a6,t0
+	
+	call PRINT_SPRITE
 	
 	
+
+PRINT_ARMA_2:
+	la t0, arma_b
+	lb t0,0(t0)
+	beq t0,zero, HUD_MANAGER_RET	
+	
+	addi t0,t0,-1
+	la t1,pos_arma_b
+	la a0, items_temp
+	lh a1,0(t1)
+	lh a2,2(t1)
+	mv a3,s0
+	li a4,16
+	mv a6,t0
+	
+	call PRINT_SPRITE
+
+
+
+
+HUD_MANAGER_RET:
+	lw ra,0(sp)
+	# lw s0 ja rolou la em cima 
+	lw s1,8(sp)
+	addi sp,sp,12
 	ret
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+# 	TODO
+#	printa tudo preto onde ficam os contadores
+# 	chama antes de printar contadores 
+#	caso ele diminua a quantidade de digitos vai ficar residuo
+LIMPA_ESPACO_HUD:
 	
 	
 	

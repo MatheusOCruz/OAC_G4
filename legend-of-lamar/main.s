@@ -5,10 +5,12 @@
 j GAME_PREP
 	
 .data
-
 link_pos: .half 128,144   # pos do link na tela (x,y)
 link_sprite_num: .byte 5  # char da animacao da andanda
 link_vida: .byte 8
+invul_frames: .byte 0 
+
+
 link_moedas: .half 100
 link_cafezin: .half 15
 link_bombas: .half 3
@@ -21,13 +23,12 @@ general_pos: .half 5,8
 
 item_counter: .byte 0	#quantidade de itens na tela atual 
 enemy_counter: .byte 0	# quantidade de inimigos na tela atual
-
 	 
-atacando: .byte 0,0	  #frame de ataque
+atacando: .byte 0,0	  #frame de ataque | direcao que o amigao tava olhando
 # 0 1 2 3 
 # w s a d
 direcao:  .byte 0 	# direcao que o jovem ta durante o ataque
-arma_do_ataque: .byte 0 # 0 -> arma a (x) , 1 -> arma b (z)
+
 
 .text	
 .include "modules/input.s"
@@ -40,12 +41,34 @@ arma_do_ataque: .byte 0 # 0 -> arma a (x) , 1 -> arma b (z)
 
 #	s0 = frame atual
 #	s1 = 0 mundo aberto 1 dungeon 2 cavernosa
+#   s5 -> duracao frame de ataque do link (os outros usam memoria)
+#   s6 -> id arma do ataque
 #	s7 = usado pelo item manager 
 #	s8 = usado pelo enemy_manager
 #	s9 = temporizador pra musica
 #	s11 = temporizador pros frames
+.macro muda_frame()
+	li t0,0xFF200604 	# endereco para mudar frame
+	sw s0,0(t0)      		# muda pro frame atual
+.end_macro
+
+.macro frame_delay(%r)
+	li t0, 16				# Esse é o periodo em ms no qual o frame tem que ficar em tela para manter em 60fps
+	csrr t1, time 			# Carrega o tempo atual
+	sub t1, t1, %r 			# Subtrai o tempo atual do tempo do ultimo frame
+	ble t1,t0, GAME_LOOP 	# se o tempo do ultimo frame for menor que 16 volta pro inicio do loop
+.end_macro
+
+.macro set_frame_duration(%fr)
+li t0, 1000
+	li t1, 60
+	fcvt.s.w ft0, t0 
+	fcvt.s.w ft1, t1 
+	fdiv.s %fr, ft0, ft1      #tempo do frame (1000/60)
+.end_macro
 
 MAIN:
+	
 	li s0,0
 	la a0,menu_1
 	li a1,0
@@ -81,20 +104,14 @@ GAME_PREP:
 	
 	csrr s11, time # time 
 	
-	li t0, 1000
-	li t1, 60
-	fcvt.s.w ft0, t0 
-	fcvt.s.w ft1, t1 
-	fdiv.s fs11, ft0, ft1      #tempo do frame (1000/60)
+	set_frame_duration(fs11)
+
 	li s1,0			   # comeca no mundo aberto
 	
 GAME_LOOP:
-	# mantem o jogo em 60 frames 
-	li t0, 16				# Esse é o periodo em ms no qual o frame tem que ficar em tela para manter em 60fps
-	csrr t1, time 			# Carrega o tempo atual
-	sub t1, t1, s11 			# Subtrai o tempo atual do tempo do ultimo frame
-	ble t1,t0, GAME_LOOP 	# se o tempo do ultimo frame for menor que 16 volta pro inicio do loop
 	
+	frame_delay(s11) #cap de 60fps
+
 	# limite de notas da musica
 	la t0, CURRENT_NOTE_DURATION		# So toca uma nota nova passados o tempo da ultima
 	lw t0, 0(t0)						# Carrega o valor da duração da nota
@@ -102,7 +119,7 @@ GAME_LOOP:
 	sub t1, t1, s9 						# Subtrai o tempo atual do tempo da ultima nota
 	ble t1, t0, NAO_TOCA				# Não toca se n passou 500 ms
 	call MUSIC_PLAY					# Toca a nota
-	csrr s9, time						# Salva o tempo da ultima nota em s10
+	csrr s9, time						# Salva o tempo da ultima nota em s9
 NAO_TOCA:
 	csrr s11, time	# Salva o tempo atual
 	
@@ -110,25 +127,17 @@ NAO_TOCA:
 	call MAP_MANAGER 
 	call HUD_MANAGER #(algo ta quebrado :( )
 	call ITEM_MANAGER
-	# carrega o link no frame
-	la a0,link_walk
-	la t0, link_sprite_num 
-	lb t0,0(t0)
-	mv a6,t0    		# a6 tem qual sprite da animacao o homi ta
-	
+	call ENEMY_MANAGER
 	call UPDATE_LINK
 	
-	# pega input e move o homi
-	li t0,0xFF200604 	# endereco para mudar frame
-	sw s0,0(t0)      		# muda pro frame atual
-	la a0,link_walk  	# pra animacao
-	addi a0,a0,8	 	# pula tamanho 
+	muda_frame()
+	
 	call GET_INPUT   
 	
 	j GAME_LOOP
 	
 
-	
+.include "modules/enemy_manager.s"
 .include "modules/item_manager.s"
 .include "modules/link.s"
 .include "modules/colisao.s"
