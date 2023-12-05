@@ -20,7 +20,7 @@ arma_a: .byte 0
 arma_b: .byte 0		  # depois tem q definir o id de cada arma pra fazer isso
 dano_items: .byte 0,0,20,0,5,10 # 0 nao sao itens, depende do id
 general_pos: .half 5,8 
-
+anim_frame: .word 0,0
 item_counter: .byte 0	#quantidade de itens na tela atual 
 enemy_counter: .byte 0	# quantidade de inimigos na tela atual
 	 
@@ -32,6 +32,8 @@ direcao:  .byte 0 	# direcao que o jovem ta durante o ataque
 
 .text	
 .include "modules/input.s"
+.include "modules/anima_estatico.s"
+.include "modules/moeda.s"
 .include "modules/print.s"
 .include "modules/map_manager.s"
 .include "modules/music.s"
