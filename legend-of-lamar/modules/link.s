@@ -9,6 +9,13 @@ link_atack_left_madeira,
 link_atack_right_madeira
 
 
+
+duracao_frame: .byte 5 # duracao por frame e nao por tempo 
+link_pos: .half 128,144   # pos do link na tela (x,y)
+link_sprite_num: .byte 5  # char da animacao da andanda
+link_vida: .byte 8
+invul_frames: .byte 0 
+
 .text
 
 UPDATE_LINK:
@@ -20,8 +27,10 @@ UPDATE_LINK:
 	sb t1,0(t0)
 
 UPDATE_LINK_2:
-	addi sp,sp,-4
+	addi sp,sp,-12
 	sw ra,0(sp)
+	sw s1,4(sp)
+	sw s2,8(sp)
 	# checa se ta atacando 
 	la t0,atacando
 	lb t1,0(t0)
@@ -71,7 +80,8 @@ LINK_ATACK:
 	la t0,link_pos
 	lh a1,0(t0)	# x do link
 	lh a2,2(t0) 	# y do link
-
+	mv s1,a1
+	mv s2,a2
 	mv a3,s0    	# frame atual
 	li a4,16	# largura sprite
 	beq t2,zero,LINK_ATAQUE_UP
@@ -85,8 +95,10 @@ LINK_ATACK:
 
 # 	TODO
 # 	dentro desses trem, ja sabe a direcao, setar x,y pro hitbox do atack
+#   x = s1 y = s2
 LINK_ATAQUE_RIGHT:
 	lw a0,12(a0)
+	addi s1,s1,16
 	j LINK_ATACK_END
 
 LINK_ATAQUE_UP:	
@@ -97,6 +109,7 @@ LINK_ATAQUE_UP:
 LINK_ATAQUE_DOWN:	
 	lw a0,4(a0)
 	li a4,16
+	addi s2,s2,16
 	j LINK_ATACK_END
 	
 LINK_ATAQUE_LEFT:
@@ -106,17 +119,15 @@ LINK_ATAQUE_LEFT:
 	# n precisa do jump aqui ne zeca
 LINK_ATACK_END:
 	call PRINT_SPRITE
-	li a0,100
-	li a7,32
-	ecall
-
-CHECK_FOR_ATACK_DAMAGE:
-	la t0,atacando
+	la t0, duracao_frame
 	lb t1,0(t0)
-	# a0,a1 -> x,y da hitbox do atack do link
-
-LINK_ATACK_RET:
-
+	addi t1,t1,-1
+	sb t1,0(t0)
+	bgt t1,zero,CHECK_FOR_ATACK_DAMAGE
+	# aqui e pq acabou a duracao do pedaco do ataque
+	li t1,5
+	sb t1,0(t0) # reinicia
+	
 	la t0,atacando
 	lb t1,0(t0)
 	li t4,4
@@ -124,8 +135,23 @@ LINK_ATACK_RET:
 	rem t1,t1,t4
 	sb t1,0(t0)
 
+CHECK_FOR_ATACK_DAMAGE:
+	la t0,atacando
+	lb t1,0(t0)
+	li t2,1 # so causa dano no 1 frame do ataque
+	bgt t1,t2,LINK_ATACK_RET
+	mv a1,s1
+	mv a2,s2
+	# a1,a2 -> x,y da hitbox do atack do link
+
+LINK_ATACK_RET:
+
+	
+
 	lw ra,0(sp)
-	addi sp,sp,4
+	lw s1,4(sp)
+	lw s2,8(sp)
+	addi sp,sp,12
 	ret	
 	
 	

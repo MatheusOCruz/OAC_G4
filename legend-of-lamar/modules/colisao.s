@@ -59,8 +59,6 @@ VOLTA_CALCULO:
 		
 		lb t4,0(t3)	     #pega o valor do quadrado
 		li t0,6
-		mv a7,t4
-		mv s5,t3
 		snez  a4,t4
 		beq t0,t4,cavernosa
 		

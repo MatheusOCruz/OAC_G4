@@ -51,7 +51,7 @@ ENEMY_MANAGER:
     sw s3,16(sp)
     sw s4,20(sp)
     sw s5,24(sp)
-    #sw s6,28(sp)
+    sw s6,28(sp)
 
     li s0,10    # iterador (nao vou usar agr)
     #la s7,inimigos_tela

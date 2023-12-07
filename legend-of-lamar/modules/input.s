@@ -51,14 +51,14 @@ MV_UP:
 	li a5,1
 	
 	call CHECK_COLISAO
-	
-	call MOEDA
-	
 	lw ra,0(sp)
 	addi sp,sp,4
 	
 	li t4,0
 	beq a0,t4,TELA_UP   # t5 = -1 e pq passou do limite da tela, troca de mapa 
+	
+
+	
 
 	bgt a4,zero,NO_INPUT
 	
@@ -107,9 +107,6 @@ MV_LEFT:
 	
 	li a5,2
 	call CHECK_COLISAO
-	
-	call MOEDA
-	
 	lw ra,0(sp)
 	addi sp,sp,4
 	
@@ -170,9 +167,6 @@ MV_DOWN:
 
 	li a5,3
 	call CHECK_COLISAO
-	
-	call MOEDA
-	
 	lw ra,0(sp)
 	addi sp,sp,4
 	
@@ -227,9 +221,6 @@ MV_RIGHT:
 	
 	li a5,4
 	call CHECK_COLISAO
-	
-	call MOEDA
-	
 	lw ra,0(sp)
 	addi sp,sp,4
 	
