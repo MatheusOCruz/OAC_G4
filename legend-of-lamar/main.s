@@ -9,6 +9,9 @@ arma_a: .byte 4
 arma_b: .byte 0		  # depois tem q definir o id de cada arma pra fazer isso
 dano_items: .byte 0,0,20,0,1,10 # 0 nao sao itens, depende do id
 general_pos: .half 5,8 
+anim_frame: .word 0,0
+pos_offset: .byte 0,0 #y/x
+map_location: .byte 2,2  # qual dos mapas na matrix dos tilemaps o bicho ta (x,y)
 
 item_counter: .byte 0	#quantidade de itens na tela atual 
 enemy_counter: .byte 0	# quantidade de inimigos na tela atual
@@ -20,6 +23,9 @@ direcao:  .byte 0 	# direcao que o jovem ta durante o ataque
 
 
 .text	
+.include "modules/colisao_inimigo.s"
+.include "modules/anima_estatico.s"
+.include "modules/moeda.s"
 .include "modules/input.s"
 .include "modules/print.s"
 .include "modules/map_manager.s"

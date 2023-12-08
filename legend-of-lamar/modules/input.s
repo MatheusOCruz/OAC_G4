@@ -48,17 +48,17 @@ MV_UP:
 	la t0, atacando
 	li t1, 0
 	sb t1,1(t0)
-	li a5,1
-	la a0, link_pos
+	li a5,0
+	
 	call CHECK_COLISAO
+	
+	call ITEM
+	
 	lw ra,0(sp)
 	addi sp,sp,4
 	
 	li t4,0
 	beq a0,t4,TELA_UP   # t5 = -1 e pq passou do limite da tela, troca de mapa 
-	
-
-	
 
 	bgt a4,zero,NO_INPUT
 	
@@ -67,6 +67,14 @@ MV_UP:
 	lh t1,2(t0)
 	addi t1,t1,-8
 	sh t1,2(t0)
+	
+
+	la t0,pos_offset
+	lb t1,0(t0)
+	addi t1,t1,8
+	andi t1,t1,8
+	sb t1,0(t0)
+	
 	
 ANIM_UP:	# para animacao
 	la t0, link_sprite_num  # sprite atual 
@@ -106,8 +114,10 @@ MV_LEFT:
 	sb t1,1(t0)
 	
 	li a5,2
-	la a0, link_pos
 	call CHECK_COLISAO
+	
+	call ITEM
+	
 	lw ra,0(sp)
 	addi sp,sp,4
 	
@@ -116,10 +126,15 @@ MV_LEFT:
 	
 	addi a3,a3,-16 
 	la t0,link_pos
-	la t0,link_pos
 	lh t1,0(t0)
 	addi t1,t1,-8
 	sh t1,0(t0)
+	
+	la t0,pos_offset
+	lb t1,1(t0)
+	addi t1,t1,8
+	andi t1,t1,8
+	sb t1,1(t0)
 
 ANIM_LEFT:
  	la t0, link_sprite_num
@@ -166,9 +181,11 @@ MV_DOWN:
 	li t1, 1
 	sb t1,1(t0)
 
-	li a5,3
-	la a0, link_pos
+	li a5,1
 	call CHECK_COLISAO
+	
+	call ITEM
+	
 	lw ra,0(sp)
 	addi sp,sp,4
 	
@@ -185,6 +202,11 @@ MV_DOWN:
 	addi t1,t1,8
 	sh t1,2(t0)
  	
+ 	la t0,pos_offset
+	lb t1,0(t0)
+	addi t1,t1,8
+	andi t1,t1,8
+	sb t1,0(t0)
 	
 	
 ANIM_DOWN:
@@ -221,9 +243,11 @@ MV_RIGHT:
 	li t1, 3
 	sb t1,1(t0)
 	
-	li a5,4
-	la a0, link_pos
+	li a5,3
 	call CHECK_COLISAO
+	
+	call ITEM
+	
 	lw ra,0(sp)
 	addi sp,sp,4
 	
@@ -238,8 +262,11 @@ MV_RIGHT:
 	addi t1,t1,8
 	sh t1,0(t0)
 	
-
- 	
+	la t0,pos_offset
+	lb t1,1(t0)
+	addi t1,t1,8
+	andi t1,t1,8
+	sb t1,1(t0)
 
 
 ANIM_RIGHT:

@@ -118,7 +118,7 @@ ENEMY_WALK:
     addi a5,a5,1
     addi a0,s7,2
     mv s0,a5
-    call CHECK_COLISAO
+    call CHECK_COLISAO_INIMIGO
     bgt a4,zero ENEMY_RET
 
     li t0,1
