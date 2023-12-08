@@ -1,8 +1,8 @@
 .data 
 .include "../assets/tiles/goblin.data"
 
-sprite_inimigo: 
-.word goblin
+sprite_inimigo: .word 
+goblin
 
 inimigos_tela: .half 
 0x010b,112,160,0,
@@ -45,6 +45,20 @@ walk_delay: .byte 120
     addi sp,sp,32
 .end_macro
 
+.macro load_enemy(%enemy_address)
+    lh t0,0(%enemy_address)
+    srli s1,t0,8    # id
+    andi s2,t0,0xff # vida
+    sh s2,0(t0)
+    sh s2,0(t0)
+    lh s3,2(%enemy_address)     # x
+    lh s4,4(%enemy_address)     # y
+    lh t0,6(%enemy_address)
+    la t1,link_moedas
+    sh t0,0(t1)
+    slli s5,t0,8    # duracao frame de animacao
+    andi s6,t0,0xff # frame atual da animacao |direcao que o guerreiro ta olhando 
+.end_macro
 
 # a0 -> id inimigo que bateu as botas
 # a1 -> x 
@@ -71,27 +85,22 @@ walk_delay: .byte 120
 # byte 7 -> frame_animacao|direcao
 ENEMY_MANAGER:
     mv a3,s0
-   
+
     inimigo_salva_pilha()
 
     li s0,10    # iterador (nao vou usar agr)
     la s7,inimigos_tela
-    lh t0,0(s7)
-    srli s1,t0,8    # id
-    andi s2,t0,0xff # vida
+    # s1 = id, s2 = vida, s3 = x s4 = y s5 = duracao frame s6 = frame atual|direcao q o homi ta de olho
+    load_enemy(s7)
+    la t0, link_moedas
     sh s2,0(t0)
-    sh s2,0(t0)
-    lh s3,2(s7)     # x
-    lh s4,4(s7)     # y
-    lh t0,6(s7)
-    la t1,link_moedas
-    sh t0,0(t1)
-    slli s5,t0,8    # duracao frame de animacao
-    andi s6,t0,0xff # frame atual da animacao |direcao que o guerreiro ta olhando 
-    la t0,link_bombas
+    la t0,link_bombas # bomba = duracao frame
     sh s5,0(t0)
+
     la t0,link_cafezin
-    sh s6,0(t0)
+    srli t3,s6,4
+    sh s3,0(t0)       # frame atual|direcao
+
     beq s1,zero,ENEMY_RET
     mv a1,s3
     mv a2,s4
@@ -139,6 +148,7 @@ ENEMY_WALK:
 #ENEMY_RIGHT
     addi s3,s3,16
     sh s3,2(s7)
+
     tail ENEMY_RET
 
 ENEMY_UP:
@@ -155,6 +165,7 @@ ENEMY_DOWN:
     addi s4,s4,16
     sh s4,4(s7)
     tail ENEMY_RET  
+
 
 
 
@@ -234,8 +245,7 @@ PRINT_INIMIGO_veio:
 PRINT_INIMIGO:
     la a0,sprite_inimigo
     lw a0,0(a0)
-    
-    #srli t0,s6,4 # frame atual da animacao (0 e 1)
+    srli t0,s6,4 # frame atual da animacao (0 e 1)
     #andi t1,s6,0xf # direcao que o campeao ta olhando 
     #addi s5,s5,-1
     #sb s5,6(s7)
@@ -255,7 +265,7 @@ PRINT_INIMIGO_2:
     mv a1,s3
     mv a2,s4
     li a4,16
-    mv a6,t0
+    li a6,0
     addi sp,sp,-4
     sw ra,0(sp)
     call PRINT_SPRITE
@@ -271,12 +281,8 @@ CHECK_ENEMY_HIT:
     inimigo_salva_pilha()
     
     la s7,inimigos_tela
-    lb s1,0(s7) # id
-    lb s2,1(s7) # vida
-    lh s3,2(s7) # x
-    lh s4,4(s7) # y
-    lb s5,6(s7) # duracao frame de animacao
-    lb s6,7(s7) # direcao que o guerreiro ta olhando
+    # s1 = id, s2 = vida, s3 = x s4 = y s5 = duracao frame s6 = frame atual|direcao q o homi ta de olho
+    load_enemy(s7) 
 
     mv t1,s3    # x inimigo
     mv t2,s4    # y inimigo
@@ -288,7 +294,7 @@ CHECK_ENEMY_HIT:
 	and t3,t3,t4  # ja faz o and dos dois pra liberar o t4
 	addi t0,t2,16
 	slt t4,a2,t0  # item.y < link.y + link.h
-	and t3,t3,t4  # libera t4 ja
+	and t3,t3,t4  
 	addi t0,a2,16
 	slt t4,t2,t0  # link.t < item.y + item.h
 	and t3,t3,t4
