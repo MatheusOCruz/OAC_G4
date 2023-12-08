@@ -5,17 +5,9 @@
 j GAME_PREP
 	
 .data
-
-
-
-link_moedas: .half 100
-link_cafezin: .half 15
-link_bombas: .half 3
-map_location: .byte 2,2  # qual dos mapas na matrix dos tilemaps o bicho ta (x,y)
-last_map_location: .byte 0,0 # pra voltar na transicao das cavernas
-arma_a: .byte 0
+arma_a: .byte 4
 arma_b: .byte 0		  # depois tem q definir o id de cada arma pra fazer isso
-dano_items: .byte 0,0,20,0,5,10 # 0 nao sao itens, depende do id
+dano_items: .byte 0,0,20,0,1,10 # 0 nao sao itens, depende do id
 general_pos: .half 5,8 
 
 item_counter: .byte 0	#quantidade de itens na tela atual 

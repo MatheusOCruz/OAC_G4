@@ -1,8 +1,8 @@
 .data 
-.include "../assets/tiles/enemy1_temp.data"
+.include "../assets/tiles/goblin.data"
 
 inimigos_tela: .half 
-0,0,0,0,
+2570,112,160,0,
 0,0,0,0,
 0,0,0,0,
 0,0,0,0,
@@ -13,9 +13,33 @@ inimigos_tela: .half
 0,0,0,0,
 0,0,0,0
 
+walk_delay: .byte 30
+
 .text
 
+.macro inimigo_salva_pilha()
+    addi sp,sp,-32
+    sw ra,0(sp)
+    sw s0,4(sp)
+    sw s1,8(sp)
+    sw s2,12(sp)
+    sw s3,16(sp)
+    sw s4,20(sp)
+    sw s5,24(sp)
+    sw s6,28(sp)
+.end_macro
 
+.macro inimigo_volta_pilha()
+    lw ra,0(sp)
+    lw s0,4(sp)
+    lw s1,8(sp)
+    lw s2,12(sp)
+    lw s3,16(sp)
+    lw s4,20(sp)
+    lw s5,24(sp)
+    lw s6,28(sp)
+    addi sp,sp,32
+.end_macro
 
 
 # a0 -> id inimigo que bateu as botas
@@ -43,55 +67,99 @@ inimigos_tela: .half
 # byte 7 -> frame_animacao|direcao
 ENEMY_MANAGER:
     mv a3,s0
-    addi sp,sp,-32
-    sw ra,0(sp)
-    sw s0,4(sp)
-    sw s1,8(sp)
-    sw s2,12(sp)
-    sw s3,16(sp)
-    sw s4,20(sp)
-    sw s5,24(sp)
-    sw s6,28(sp)
+   
+    inimigo_salva_pilha()
 
     li s0,10    # iterador (nao vou usar agr)
-    #la s7,inimigos_tela
+    la s7,inimigos_tela
+    lh t0,0(s7)
+    slli s1,t0,8
+    andi s2,t0,0xff
+    lh s3,2(s7) # x
+    lh s4,4(s7) # y
+    lb s5,6(s7) # duracao frame de animacao
+    lb s6,7(s7) # direcao que o guerreiro ta olhando
+    la t0,link_moedas
+    sb s2,0(t0)
 
-    #lb s1,0(s7) # id
-    #lb s2,1(s7) # vida
-    #lh s3,2(s7) # x
-    #lh s4,4(s7) # y
-    #lb s5,6(s7) # duracao frame de animacao
-    #lb s6,7(s7) # direcao que o guerreiro ta olhando
-    li s1,1
-    li s2,2
-    li s3,112
-    li s4,144
-    li s6,0
+    beq s1,zero,ENEMY_RET
     mv a1,s3
     mv a2,s4
     call COLISAO_INIMIGO
     call PRINT_INIMIGO
+    call ENEMY_WALK
     # fazer aqui pro do id 1
 
     
     
 
 ENEMY_RET:
-    lw ra,0(sp)
-    lw s0,4(sp)
-    lw s1,8(sp)
-    lw s2,12(sp)
-    lw s3,16(sp)
-    lw s4,20(sp)
-    lw s5,24(sp)
-    lw s6,28(sp)
-    addi sp,sp,32
+    inimigo_volta_pilha()
     ret 
 
 
 # , frame animacao, duracao direcao q ta olhano
+ENEMY_WALK:
+    la t0, walk_delay
+    lb t1,0(t0)
+    addi t1,t1,-1
+    sb t1,0(t0)
+    bgt t1,zero,ENEMY_RET
+    li t1,30
+    sb t1,0(t0)
+    csrr t0,time
+    li t1,100
+    rem t2,t0,t1
+    li t1,4
+    bgt t1,t2,ENEMY_RET
+    rem a5,t0,t1 #direcao
+    addi a5,a5,1
+    addi a0,s7,2
+    mv s0,a5
+    call CHECK_COLISAO
+    bgt a4,zero ENEMY_RET
+
+    beq s0,zero,ENEMY_UP
+    li t0,1
+    beq s0,t0,ENEMY_LEFT
+    li t0,2
+    beq s0,t0,ENEMY_DOWN
+#ENEMY_RIGHT
+    addi s3,s3,16
+    sh s3,2(s7)
+    tail ENEMY_RET
+
+ENEMY_UP:
+    addi s4,s4,-16
+    sh s4,4(s7)
+    tail ENEMY_RET
+
+ENEMY_LEFT:
+    addi s3,s3,-16
+    sh s3,2(s7)
+    tail ENEMY_RET
+
+ENEMY_DOWN:
+    addi s4,s4,16
+    sh s4,4(s7)
+    tail ENEMY_RET  
+
+
+
 
 GERA_DROP:
+    csrr t0,time
+    li t1,10
+    rem t2,t0,t1
+    li t1,6
+    bgt t2,t1,ENEMY_RET
+    li t1,3
+    rem a0,t0,t1
+    addi a0,a0,1
+    mv a1,s3
+    mv a2,s4
+    CALL ADD_ITEM
+    tail ENEMY_RET
 
 # RNG PRA DROPAR ITENZINHO
 
@@ -134,9 +202,9 @@ COLISAO_INIMIGO:
 	bne t3,zero,ENEMY_HIT_LINK_CHECK
 	ret
    
-# TODO
+
 PRINT_INIMIGO:
-    la a0,enemy1_temp
+    la a0,goblin
     mv a1,s3
     mv a2,s4
     li a4,16
@@ -148,4 +216,47 @@ PRINT_INIMIGO:
     addi sp,sp,4
     ret 
 
+# a1 = x ataque 
+# a2 = y ataque
+# a3 = dano 
+# TODO : adaptar para olhar todos os inimigos
+CHECK_ENEMY_HIT:
+    inimigo_salva_pilha()
+    
+    la s7,inimigos_tela
+    lb s1,0(s7) # id
+    lb s2,1(s7) # vida
+    lh s3,2(s7) # x
+    lh s4,4(s7) # y
+    lb s5,6(s7) # duracao frame de animacao
+    lb s6,7(s7) # direcao que o guerreiro ta olhando
 
+    mv t1,s3    # x inimigo
+    mv t2,s4    # y inimigo
+
+    addi t0,t1,16
+	slt t3, a1,t0 # item.x < link.x + link.w
+	addi t0,a1,16
+	slt t4,t1,t0  # link.x < item.x + item.w
+	and t3,t3,t4  # ja faz o and dos dois pra liberar o t4
+	addi t0,t2,16
+	slt t4,a2,t0  # item.y < link.y + link.h
+	and t3,t3,t4  # libera t4 ja
+	addi t0,a2,16
+	slt t4,t2,t0  # link.t < item.y + item.h
+	and t3,t3,t4
+    bne t3,zero,ENEMY_HIT
+    tail ENEMY_RET
+    
+ENEMY_HIT:
+    sub s2,s2,a3
+    sb s2,1(s7)
+    ble s2,zero,REMOVE_ENEMY
+    tail ENEMY_RET
+
+
+REMOVE_ENEMY:
+    sw zero,0(s7)
+    tail GERA_DROP
+
+    

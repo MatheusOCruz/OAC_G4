@@ -16,6 +16,10 @@ link_sprite_num: .byte 5  # char da animacao da andanda
 link_vida: .byte 8
 invul_frames: .byte 0 
 
+link_moedas: .half 0
+link_cafezin: .half 15
+link_bombas: .half 3
+
 .text
 
 UPDATE_LINK:
@@ -78,7 +82,7 @@ LINK_ATACK:
 
 	# nao usa mais t0,t1
 	la t0,link_pos
-	lh a1,0(t0)	# x do link
+	lh a1,0(t0)		# x do link
 	lh a2,2(t0) 	# y do link
 	mv s1,a1
 	mv s2,a2
@@ -104,6 +108,7 @@ LINK_ATAQUE_RIGHT:
 LINK_ATAQUE_UP:	
 	lw a0,0(a0)
 	addi a2,a2,-16
+	addi s2,s2,-16
 	j LINK_ATACK_END
 	
 LINK_ATAQUE_DOWN:	
@@ -115,6 +120,7 @@ LINK_ATAQUE_DOWN:
 LINK_ATAQUE_LEFT:
 	lw a0,8(a0)
 	addi a1,a1,-16
+	addi s1,s1,-16
 
 	# n precisa do jump aqui ne zeca
 LINK_ATACK_END:
@@ -142,8 +148,12 @@ CHECK_FOR_ATACK_DAMAGE:
 	bgt t1,t2,LINK_ATACK_RET
 	mv a1,s1
 	mv a2,s2
+	la a3,dano_items
+	add a3,a3,s6 #id da arma de ataque 
+	lb a3,0(a3) # dano do ataque
 	# a1,a2 -> x,y da hitbox do atack do link
-
+	CALL CHECK_ENEMY_HIT
+	
 LINK_ATACK_RET:
 
 	

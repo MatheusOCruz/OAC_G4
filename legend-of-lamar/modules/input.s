@@ -49,7 +49,7 @@ MV_UP:
 	li t1, 0
 	sb t1,1(t0)
 	li a5,1
-	
+	la a0, link_pos
 	call CHECK_COLISAO
 	lw ra,0(sp)
 	addi sp,sp,4
@@ -106,6 +106,7 @@ MV_LEFT:
 	sb t1,1(t0)
 	
 	li a5,2
+	la a0, link_pos
 	call CHECK_COLISAO
 	lw ra,0(sp)
 	addi sp,sp,4
@@ -166,6 +167,7 @@ MV_DOWN:
 	sb t1,1(t0)
 
 	li a5,3
+	la a0, link_pos
 	call CHECK_COLISAO
 	lw ra,0(sp)
 	addi sp,sp,4
@@ -220,6 +222,7 @@ MV_RIGHT:
 	sb t1,1(t0)
 	
 	li a5,4
+	la a0, link_pos
 	call CHECK_COLISAO
 	lw ra,0(sp)
 	addi sp,sp,4

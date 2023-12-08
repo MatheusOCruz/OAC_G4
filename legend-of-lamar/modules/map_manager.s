@@ -2,6 +2,10 @@
 .data
 
 .include "../assets/tiles/tilemap_com_dg_temp.data"
+
+map_location: .byte 2,2  # qual dos mapas na matrix dos tilemaps o bicho ta (x,y)
+last_map_location: .byte 0,0 # pra voltar na transicao das cavernas
+
 x_inicial: .byte 0
 y_inicial: .byte 64
 camera:	   .byte 40,22

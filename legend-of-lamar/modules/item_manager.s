@@ -69,17 +69,10 @@ ITEM_RET:
 	
 #	TODO
 #   1 - adicionar na proxima posicao livre
-#   2 - verificar se ja tem 10 	
 #   3 - gerenciar adicao de itens em caso de ja terem sido usadas as 10 posicoes e algum foi pego
 
 ADD_ITEM:
-
-	la t0,item_counter
-	lb t1,0(t0)
-	li t2,6
-	mul t2,t2,t1	# deslocamento pra proxima posicao livre
 	la t3,items_tela
-	add t3,t3,t2
 	sh a0,0(t3)
 	sh a1,2(t3)
 	sh a2,4(t3)
@@ -133,6 +126,7 @@ COLISAO_ITEM:
 	
 
 PEGA_ITEM:
+	li t0,1
 	la t0,arma_a
 	li t1,4
 	sb t1,0(t0)

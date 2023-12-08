@@ -11,7 +11,7 @@ CHECK_COLISAO:
 		add a1,t3,t4			#posição do link no mapa geral
 		
 		
-		la t0,link_pos
+		mv t0,a0
 		la t3,teste_mapa_tilemap
 		addi t3,t3,8 #pegando a matriz da tela e pulando os dados
 	
