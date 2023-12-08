@@ -1,11 +1,12 @@
 .data 
 .include "../assets/tiles/goblin.data"
 
-
+sprite_inimigo: 
+.word goblin
 
 inimigos_tela: .half 
-300,112,160,1280,
-525,208,144,0,
+0x010b,112,160,0,
+0,0,0,0,
 0,0,0,0,
 0,0,0,0,
 0,0,0,0,
@@ -76,13 +77,21 @@ ENEMY_MANAGER:
     li s0,10    # iterador (nao vou usar agr)
     la s7,inimigos_tela
     lh t0,0(s7)
-    slli s1,t0,8    # id
+    srli s1,t0,8    # id
     andi s2,t0,0xff # vida
+    sh s2,0(t0)
+    sh s2,0(t0)
     lh s3,2(s7)     # x
     lh s4,4(s7)     # y
     lh t0,6(s7)
+    la t1,link_moedas
+    sh t0,0(t1)
     slli s5,t0,8    # duracao frame de animacao
     andi s6,t0,0xff # frame atual da animacao |direcao que o guerreiro ta olhando 
+    la t0,link_bombas
+    sh s5,0(t0)
+    la t0,link_cafezin
+    sh s6,0(t0)
     beq s1,zero,ENEMY_RET
     mv a1,s3
     mv a2,s4
@@ -209,8 +218,8 @@ COLISAO_INIMIGO:
 # considerar direcao pra escolher sprite certa
 # trem pro boss q e grandao
 
-PRINT_INIMIGO:
- la a0,goblin
+PRINT_INIMIGO_veio:
+    la a0,goblin
     mv a1,s3
     mv a2,s4
     li a4,16
@@ -222,26 +231,31 @@ PRINT_INIMIGO:
     addi sp,sp,4
     ret 
 
-PRINT_INIMIGO_QUEBRADO:
-    la a0,goblin
-    srli s1,s1,2
-    #add a0,a0,s1  # endereco do sprite do inimigo em relacao ao id
+PRINT_INIMIGO:
+    la a0,sprite_inimigo
     lw a0,0(a0)
-    #slli t0,s6,4 # frame atual da animacao (0 e 1)
+    
+    #srli t0,s6,4 # frame atual da animacao (0 e 1)
     #andi t1,s6,0xf # direcao que o campeao ta olhando 
     #addi s5,s5,-1
     #sb s5,6(s7)
+    #la t4,link_moedas
+    #sh s5,0(t4)
     #bne s5,zero,PRINT_INIMIGO_2
     #xori t0,t0,1 # inverte o frame
-    #srli t0,t0,4
-    #mv s6,t0
-    #add s6,s6,t1 
+    #la t4,link_bombas
+    #lh t0,0(t4)
+    #slli t3,t0,4
+    #mv s6,t3
+    #add s6,s6,t1
+    #sb s5,6(s7)
+    #sb s6,7(s7) 
     
 PRINT_INIMIGO_2:
     mv a1,s3
     mv a2,s4
     li a4,16
-    li a6,0
+    mv a6,t0
     addi sp,sp,-4
     sw ra,0(sp)
     call PRINT_SPRITE
@@ -293,3 +307,19 @@ REMOVE_ENEMY:
     tail GERA_DROP
 
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

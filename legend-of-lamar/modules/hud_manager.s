@@ -70,8 +70,8 @@ PRINT_DINDIN:
 	la t0,link_moedas
 	lhu a0,0(t0)
 	li t0,999
-	blt a0,t0,PRINT_DINDIN_2
-	li a0,999  
+	#blt a0,t0,PRINT_DINDIN_2
+	#li a0,999  
 	# tem mais de 999 moedas, mas para o display em 999
 PRINT_DINDIN_2:
 	la t0,pos_moedas
