@@ -1,9 +1,11 @@
 .data 
 .include "../assets/tiles/goblin.data"
 
+
+
 inimigos_tela: .half 
-2570,112,160,0,
-0,0,0,0,
+300,112,160,1280,
+525,208,144,0,
 0,0,0,0,
 0,0,0,0,
 0,0,0,0,
@@ -13,8 +15,8 @@ inimigos_tela: .half
 0,0,0,0,
 0,0,0,0
 
-walk_delay: .byte 30
-
+walk_delay: .byte 120
+# 0101 0000
 .text
 
 .macro inimigo_salva_pilha()
@@ -27,6 +29,7 @@ walk_delay: .byte 30
     sw s4,20(sp)
     sw s5,24(sp)
     sw s6,28(sp)
+    
 .end_macro
 
 .macro inimigo_volta_pilha()
@@ -73,21 +76,22 @@ ENEMY_MANAGER:
     li s0,10    # iterador (nao vou usar agr)
     la s7,inimigos_tela
     lh t0,0(s7)
-    slli s1,t0,8
-    andi s2,t0,0xff
-    lh s3,2(s7) # x
-    lh s4,4(s7) # y
-    lb s5,6(s7) # duracao frame de animacao
-    lb s6,7(s7) # direcao que o guerreiro ta olhando
-    la t0,link_moedas
-    sb s2,0(t0)
-
+    slli s1,t0,8    # id
+    andi s2,t0,0xff # vida
+    lh s3,2(s7)     # x
+    lh s4,4(s7)     # y
+    lh t0,6(s7)
+    slli s5,t0,8    # duracao frame de animacao
+    andi s6,t0,0xff # frame atual da animacao |direcao que o guerreiro ta olhando 
     beq s1,zero,ENEMY_RET
     mv a1,s3
     mv a2,s4
-    call COLISAO_INIMIGO
     call PRINT_INIMIGO
+    call COLISAO_INIMIGO
     call ENEMY_WALK
+    
+    
+    
     # fazer aqui pro do id 1
 
     
@@ -105,24 +109,23 @@ ENEMY_WALK:
     addi t1,t1,-1
     sb t1,0(t0)
     bgt t1,zero,ENEMY_RET
-    li t1,30
+    li t1,120
     sb t1,0(t0)
-    csrr t0,time
-    li t1,100
-    rem t2,t0,t1
+    li a7,41
+    ecall
     li t1,4
-    bgt t1,t2,ENEMY_RET
-    rem a5,t0,t1 #direcao
+    rem a5,a0,t1 #direcao
     addi a5,a5,1
     addi a0,s7,2
     mv s0,a5
     call CHECK_COLISAO
     bgt a4,zero ENEMY_RET
 
-    beq s0,zero,ENEMY_UP
     li t0,1
-    beq s0,t0,ENEMY_LEFT
+    beq s0,t0,ENEMY_UP
     li t0,2
+    beq s0,t0,ENEMY_LEFT
+    li t0,3
     beq s0,t0,ENEMY_DOWN
 #ENEMY_RIGHT
     addi s3,s3,16
@@ -202,9 +205,39 @@ COLISAO_INIMIGO:
 	bne t3,zero,ENEMY_HIT_LINK_CHECK
 	ret
    
+# TODO 
+# considerar direcao pra escolher sprite certa
+# trem pro boss q e grandao
 
 PRINT_INIMIGO:
+ la a0,goblin
+    mv a1,s3
+    mv a2,s4
+    li a4,16
+    li a6,0
+    addi sp,sp,-4
+    sw ra,0(sp)
+    call PRINT_SPRITE
+    lw ra,0(sp)
+    addi sp,sp,4
+    ret 
+
+PRINT_INIMIGO_QUEBRADO:
     la a0,goblin
+    srli s1,s1,2
+    #add a0,a0,s1  # endereco do sprite do inimigo em relacao ao id
+    lw a0,0(a0)
+    #slli t0,s6,4 # frame atual da animacao (0 e 1)
+    #andi t1,s6,0xf # direcao que o campeao ta olhando 
+    #addi s5,s5,-1
+    #sb s5,6(s7)
+    #bne s5,zero,PRINT_INIMIGO_2
+    #xori t0,t0,1 # inverte o frame
+    #srli t0,t0,4
+    #mv s6,t0
+    #add s6,s6,t1 
+    
+PRINT_INIMIGO_2:
     mv a1,s3
     mv a2,s4
     li a4,16

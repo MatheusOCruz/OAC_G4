@@ -92,13 +92,11 @@ LINK_ATACK:
 	li t3,1
 	beq t2,t3,LINK_ATAQUE_DOWN
 	slli a6,a6,1
-	li t3,2
 	li a4,32	# largura sprite horizontal
+	li t3,2
 	beq t2,t3,LINK_ATAQUE_LEFT
 # se n for nenhum desses e o right
 
-# 	TODO
-# 	dentro desses trem, ja sabe a direcao, setar x,y pro hitbox do atack
 #   x = s1 y = s2
 LINK_ATAQUE_RIGHT:
 	lw a0,12(a0)

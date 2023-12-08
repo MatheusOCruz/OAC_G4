@@ -1,7 +1,7 @@
 .text
 
 CHECK_COLISAO:
-		la t0,map_location  		#em qual dos mapas o link ta
+		la t0,map_location  		#em qual dos mapas o cidadao ta
 		lb t1,0(t0)			#x
 		lb t2,1(t0)			#y
 		li t3,20			#tamanho x de uma tela
