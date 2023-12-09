@@ -3,10 +3,10 @@
 
 sprite_inimigo: .word 
 goblin
-
+# 78
 inimigos_tela: .half 
-0x010b,112,160,0x7800,
-0,0,0,0,
+0x010b,112,160,0x1e06,
+0x010b,112,144,0x1e06,
 0,0,0,0,
 0,0,0,0, 
 0,0,0,0,
@@ -16,13 +16,15 @@ inimigos_tela: .half
 0,0,0,0,
 0,0,0,0
 
-walk_delay: .byte 120
+walk_delay: .byte 
+1
+
 # 0101 0000
 .text
 
 
 .macro inimigo_salva_pilha()
-    addi sp,sp,-32
+    addi sp,sp,-36
     sw ra,0(sp)
     sw s0,4(sp)
     sw s1,8(sp)
@@ -31,7 +33,7 @@ walk_delay: .byte 120
     sw s4,20(sp)
     sw s5,24(sp)
     sw s6,28(sp)
-    
+    sw s8,32(sp)
 .end_macro
 
 .macro inimigo_volta_pilha()
@@ -43,7 +45,8 @@ walk_delay: .byte 120
     lw s4,20(sp)
     lw s5,24(sp)
     lw s6,28(sp)
-    addi sp,sp,32
+    lw s8,32(sp)
+    addi sp,sp,36
 .end_macro
 
 .macro load_enemy(%enemy_address)
@@ -53,10 +56,9 @@ walk_delay: .byte 120
     lh s3,2(%enemy_address)     # x
     lh s4,4(%enemy_address)     # y
     lh t0,6(%enemy_address)     # s5/s6
-    la t1,link_moedas
     srli s5,t0,8    # duracao frame de animacao 
     andi s6,t0,0xff # frame atual da animacao |direcao que o guerreiro ta olhando 
-    sh s5,0(t1)
+
 .end_macro
 
 # a0 -> id inimigo que bateu as botas
@@ -89,21 +91,21 @@ ENEMY_MANAGER:
 
     li s0,10    # iterador (nao vou usar agr)
     la s7,inimigos_tela
+ENEMY_MANAGER_LOOP:
     # s1 = id, s2 = vida, s3 = x s4 = y s5 = duracao frame s6 = frame atual|direcao q o homi ta de olho
     load_enemy(s7)
 
-    beq s1,zero,ENEMY_RET
+    beq s1,zero,ENEMY_MANAGER_LOOPER
     mv a1,s3
     mv a2,s4
     call PRINT_INIMIGO
     call COLISAO_INIMIGO
     call ENEMY_WALK
     
-    
-    
-    # fazer aqui pro do id 1
-
-    
+ENEMY_MANAGER_LOOPER:
+    addi s7,s7,8
+    addi s0,s0,-1
+    bgt s0,zero,ENEMY_MANAGER_LOOP
     
 
 ENEMY_RET:
@@ -113,53 +115,92 @@ ENEMY_RET:
 
 # , frame animacao, duracao direcao q ta olhano
 ENEMY_WALK:
-    
     addi s5,s5,-1
+    
     bne s5,zero,ENEMY_MOVE_END
-    li s5,120
-    b ENEMY_MOVE_END
+    #la t0,walk_delay
+    #addi t1,t1,-1
+    #slli t1,t1,2
+    #add t0,t0,t1
+    li s5,30
+
     li a7,41
     ecall
+    # numero
     li t1,4
     rem a5,a0,t1
     addi a5,a5,1  #direcao
 
     addi a0,s7,2
-    mv s0,a5            # S0 JA E O CONTADOR, TEM Q MUDAR QUANDO FOR TER LOOP
+    mv s8,a5            # S0 JA E O CONTADOR, TEM Q MUDAR QUANDO FOR TER LOOP
     call CHECK_COLISAO_INIMIGO
     bgt a4,zero ENEMY_MOVE_END
 
+    srli t1,s6,4    # frame
+    andi t1,s6,0xf  # dir
+
     li t0,1
-    beq s0,t0,ENEMY_UP
+    beq s8,t0,ENEMY_UP
     li t0,2
-    beq s0,t0,ENEMY_LEFT
+    beq s8,t0,ENEMY_LEFT
     li t0,3
-    beq s0,t0,ENEMY_DOWN
+    beq s8,t0,ENEMY_DOWN
 #ENEMY_RIGHT
     addi s3,s3,16
     sh s3,2(s7)
 
+    li t0,3 
+    srli t1,s6,1
+    bne t1,t0,ENEMY_ENEMY_RIGHT_0
+    xori s6,s6,1 # caso ja esteja pra direita muda o frame so
     tail ENEMY_MOVE_END
-
+ENEMY_ENEMY_RIGHT_0:
+    li s6,6
+    tail ENEMY_MOVE_END
 ENEMY_UP:
     addi s4,s4,-16
     sh s4,4(s7)
+    
+    li t0,0
+    srli t1,s6,1
+    bne t1,t0,ENEMY_ENEMY_UP_0
+    xori s6,s6,1 # caso ja esteja pra direita muda o frame so
+    tail ENEMY_MOVE_END
+ENEMY_ENEMY_UP_0:
+    li s6,0
     tail ENEMY_MOVE_END
 
 ENEMY_LEFT:
     addi s3,s3,-16
     sh s3,2(s7)
+    
+    li t0,2
+    srli t1,s6,1
+    bne t1,t0,ENEMY_ENEMY_LEFT_0
+    xori s6,s6,1 # caso ja esteja pra direita muda o frame so
+    tail ENEMY_MOVE_END
+ENEMY_ENEMY_LEFT_0:
+    li s6,4
     tail ENEMY_MOVE_END
 
 ENEMY_DOWN:
     addi s4,s4,16
     sh s4,4(s7)
 
+    li t0,1
+    srli t1,s6,1
+    bne t1,t0,ENEMY_ENEMY_DOWN_0
+    xori s6,s6,1 # caso ja esteja pra direita muda o frame so
+    tail ENEMY_MOVE_END
+ENEMY_ENEMY_DOWN_0:
+    li s6,2
+    
+
 ENEMY_MOVE_END:
-    slli t0,s5,8
-    add t0,t0,s6
-    sh t0,6(s7) # depois eu vejo como otimizar esses saves duvidosos
-    ret
+    slli t4,s5,8
+    add t4,t4,s6
+    sh t4,6(s7)
+    b ENEMY_MANAGER_LOOPER
 
 
 
@@ -222,43 +263,17 @@ COLISAO_INIMIGO:
 # considerar direcao pra escolher sprite certa
 # trem pro boss q e grandao
 
-PRINT_INIMIGO_veio:
-    la a0,goblin
-    mv a1,s3
-    mv a2,s4
-    li a4,16
-    li a6,0
-    addi sp,sp,-4
-    sw ra,0(sp)
-    call PRINT_SPRITE
-    lw ra,0(sp)
-    addi sp,sp,4
-    ret 
-
 PRINT_INIMIGO:
     la a0,sprite_inimigo
     lw a0,0(a0)
-    #srli t0,s6,4 # frame atual da animacao (0 e 1)
-    #andi t1,s6,0xf # direcao que o campeao ta olhando 
-    #addi s5,s5,-1
-    #sb s5,6(s7)
-    #la t4,link_moedas
-    #sh s5,0(t4)
-    #bne s5,zero,PRINT_INIMIGO_2
-    #xori t0,t0,1 # inverte o frame
-    #la t4,link_bombas
-    #lh t0,0(t4)
-    #slli t3,t0,4
-    #mv s6,t3
-    #add s6,s6,t1
-    #sb s5,6(s7)
-    #sb s6,7(s7) 
+    
     
 PRINT_INIMIGO_2:
     mv a1,s3
     mv a2,s4
     li a4,16
-    li a6,0
+    # pega o frame do s6 e bota no a6
+    mv a6,s6
     addi sp,sp,-4
     sw ra,0(sp)
     call PRINT_SPRITE
@@ -272,8 +287,9 @@ PRINT_INIMIGO_2:
 # TODO : adaptar para olhar todos os inimigos
 CHECK_ENEMY_HIT:
     inimigo_salva_pilha()
-    
+    li s0,10
     la s7,inimigos_tela
+CHECK_ENEMY_HIT_LOOP:  
     # s1 = id, s2 = vida, s3 = x s4 = y s5 = duracao frame s6 = frame atual|direcao q o homi ta de olho
     load_enemy(s7) 
 
@@ -292,8 +308,11 @@ CHECK_ENEMY_HIT:
 	slt t4,t2,t0  # link.t < item.y + item.h
 	and t3,t3,t4
     bne t3,zero,ENEMY_HIT
+CHECK_ENEMY_HIT_LOOPER:  
+    addi s7,s7,8
+    addi s0,s0,-1
+    bgt s0,zero,CHECK_ENEMY_HIT_LOOP
     tail ENEMY_RET
-    
 ENEMY_HIT:
     sub s2,s2,a3
     slli t0,s1,8

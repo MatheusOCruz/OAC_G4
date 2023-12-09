@@ -104,22 +104,19 @@ GAME_PREP:
 	li s1,0			   # comeca no mundo aberto
 	
 GAME_LOOP:
-	
 	frame_delay(s11) #cap de 60fps
-
-	# limite de notas da musica
-	call MUSIC_MANAGER
 	csrr s11, time	# Salva o tempo atual
-	
 	xori s0,s0,1  # troca frame
+
+	call MUSIC_MANAGER
 	call MAP_MANAGER 
 	call HUD_MANAGER #(algo ta quebrado :( )
 	call ITEM_MANAGER
 	call ENEMY_MANAGER
 	call UPDATE_LINK
-	
+
 	muda_frame()
-	
+
 	call GET_INPUT   
 	
 	j GAME_LOOP
