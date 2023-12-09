@@ -5,10 +5,10 @@ sprite_inimigo: .word
 goblin
 
 inimigos_tela: .half 
-0x010b,112,160,0,
+0x010b,112,160,0x7800,
 0,0,0,0,
 0,0,0,0,
-0,0,0,0,
+0,0,0,0, 
 0,0,0,0,
 0,0,0,0,
 0,0,0,0,
@@ -19,6 +19,7 @@ inimigos_tela: .half
 walk_delay: .byte 120
 # 0101 0000
 .text
+
 
 .macro inimigo_salva_pilha()
     addi sp,sp,-32
@@ -46,18 +47,16 @@ walk_delay: .byte 120
 .end_macro
 
 .macro load_enemy(%enemy_address)
-    lh t0,0(%enemy_address)
+    lh t0,0(%enemy_address) # s1/s2+
     srli s1,t0,8    # id
     andi s2,t0,0xff # vida
-    sh s2,0(t0)
-    sh s2,0(t0)
     lh s3,2(%enemy_address)     # x
     lh s4,4(%enemy_address)     # y
-    lh t0,6(%enemy_address)
+    lh t0,6(%enemy_address)     # s5/s6
     la t1,link_moedas
-    sh t0,0(t1)
-    slli s5,t0,8    # duracao frame de animacao
+    srli s5,t0,8    # duracao frame de animacao 
     andi s6,t0,0xff # frame atual da animacao |direcao que o guerreiro ta olhando 
+    sh s5,0(t1)
 .end_macro
 
 # a0 -> id inimigo que bateu as botas
@@ -92,14 +91,6 @@ ENEMY_MANAGER:
     la s7,inimigos_tela
     # s1 = id, s2 = vida, s3 = x s4 = y s5 = duracao frame s6 = frame atual|direcao q o homi ta de olho
     load_enemy(s7)
-    la t0, link_moedas
-    sh s2,0(t0)
-    la t0,link_bombas # bomba = duracao frame
-    sh s5,0(t0)
-
-    la t0,link_cafezin
-    srli t3,s6,4
-    sh s3,0(t0)       # frame atual|direcao
 
     beq s1,zero,ENEMY_RET
     mv a1,s3
@@ -122,22 +113,21 @@ ENEMY_RET:
 
 # , frame animacao, duracao direcao q ta olhano
 ENEMY_WALK:
-    la t0, walk_delay
-    lb t1,0(t0)
-    addi t1,t1,-1
-    sb t1,0(t0)
-    bgt t1,zero,ENEMY_RET
-    li t1,120
-    sb t1,0(t0)
+    
+    addi s5,s5,-1
+    bne s5,zero,ENEMY_MOVE_END
+    li s5,120
+    b ENEMY_MOVE_END
     li a7,41
     ecall
     li t1,4
-    rem a5,a0,t1 #direcao
-    addi a5,a5,1
+    rem a5,a0,t1
+    addi a5,a5,1  #direcao
+
     addi a0,s7,2
-    mv s0,a5
+    mv s0,a5            # S0 JA E O CONTADOR, TEM Q MUDAR QUANDO FOR TER LOOP
     call CHECK_COLISAO_INIMIGO
-    bgt a4,zero ENEMY_RET
+    bgt a4,zero ENEMY_MOVE_END
 
     li t0,1
     beq s0,t0,ENEMY_UP
@@ -149,24 +139,27 @@ ENEMY_WALK:
     addi s3,s3,16
     sh s3,2(s7)
 
-    tail ENEMY_RET
+    tail ENEMY_MOVE_END
 
 ENEMY_UP:
     addi s4,s4,-16
     sh s4,4(s7)
-    tail ENEMY_RET
+    tail ENEMY_MOVE_END
 
 ENEMY_LEFT:
     addi s3,s3,-16
     sh s3,2(s7)
-    tail ENEMY_RET
+    tail ENEMY_MOVE_END
 
 ENEMY_DOWN:
     addi s4,s4,16
     sh s4,4(s7)
-    tail ENEMY_RET  
 
-
+ENEMY_MOVE_END:
+    slli t0,s5,8
+    add t0,t0,s6
+    sh t0,6(s7) # depois eu vejo como otimizar esses saves duvidosos
+    ret
 
 
 
@@ -245,7 +238,7 @@ PRINT_INIMIGO_veio:
 PRINT_INIMIGO:
     la a0,sprite_inimigo
     lw a0,0(a0)
-    srli t0,s6,4 # frame atual da animacao (0 e 1)
+    #srli t0,s6,4 # frame atual da animacao (0 e 1)
     #andi t1,s6,0xf # direcao que o campeao ta olhando 
     #addi s5,s5,-1
     #sb s5,6(s7)
@@ -303,7 +296,9 @@ CHECK_ENEMY_HIT:
     
 ENEMY_HIT:
     sub s2,s2,a3
-    sb s2,1(s7)
+    slli t0,s1,8
+    add t0,t0,s2    # por algum motivo usar byte simplesmente nao funciona
+    sh t0,0(s7)
     ble s2,zero,REMOVE_ENEMY
     tail ENEMY_RET
 
@@ -313,7 +308,6 @@ REMOVE_ENEMY:
     tail GERA_DROP
 
     
-
 
 
 

@@ -161,7 +161,6 @@ MAP_TRANSITION:
 	
 	
 MAP_TRANSITION_VERTICAL_PRINT:
-	
 	la a0, game_tiles
 	# a1 ja e definido
 	# a2 ja e definido
@@ -223,11 +222,9 @@ proximo:
 	mul t2,t2,s1
 	add s0,s0,t2
 	
-	
 	li a0 100
 	li a7,32
 	ecall
-	
 	li a1,0	    	# x inicial do print
 	li a2,64    	# y inicial do print
 	mv s2,zero   	# contador de tiles por linha (max = 20)

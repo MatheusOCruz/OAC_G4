@@ -108,14 +108,7 @@ GAME_LOOP:
 	frame_delay(s11) #cap de 60fps
 
 	# limite de notas da musica
-	la t0, CURRENT_NOTE_DURATION		# So toca uma nota nova passados o tempo da ultima
-	lw t0, 0(t0)						# Carrega o valor da duração da nota
-	csrr t1, time 						# Carrega o tempo atual
-	sub t1, t1, s9 						# Subtrai o tempo atual do tempo da ultima nota
-	ble t1, t0, NAO_TOCA				# Não toca se n passou 500 ms
-	call MUSIC_PLAY					# Toca a nota
-	csrr s9, time						# Salva o tempo da ultima nota em s9
-NAO_TOCA:
+	call MUSIC_MANAGER
 	csrr s11, time	# Salva o tempo atual
 	
 	xori s0,s0,1  # troca frame

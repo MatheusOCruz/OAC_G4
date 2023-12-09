@@ -14,7 +14,20 @@ CURRENT_NOTE_INDEX: .word 0 		# O indice sempre sera o numero que devemos adicio
 CURRENT_NOTE_DURATION: .word 300 # A duracao da nota atual para ser usada na main, inicialmente pode ser a primeira
 
 .text
-# Play 
+
+
+
+
+MUSIC_MANAGER:
+	la t0, CURRENT_NOTE_DURATION		# So toca uma nota nova passados o tempo da ultima
+	lw t0, 0(t0)						# Carrega o valor da duração da nota
+	csrr t1, time 						# Carrega o tempo atual
+	sub t1, t1, s9 						# Subtrai o tempo atual do tempo da ultima nota
+	ble t1, t0, MUSIC_RET				# Não toca se n passou 500 ms
+	b MUSIC_PLAY					# Toca a nota				
+
+
+# Play
 MUSIC_PLAY:
 	la t0, NOTES		      	 		# Carrega o endereco inicial das notas
 	la t1, CURRENT_NOTE_INDEX  		# Carrega o indice da nota atual
@@ -36,12 +49,15 @@ MUSIC_PLAY:
 	# Se chegamos no indice final reseta a musica
 	la t3, NUM_OF_NOTES 		# Carrega o endereco do NUM_OF_NOTES
 	lw t3, 0(t3)		    		# Substitui o t3 pelo valor no endereco
-	li t5, 8			    		# Carrega 8 em t5
-	mul t4, t3, t5		    		# NUM_OF_NOTES * 8
-	ble  t2, t4, FIM 		    	       	# Se o indice atual for maior do que o NUM_OF_NOTES agt zera o indice
+	li t5, 8			    		# Carrega 8 	    	       
+	ble  t2, t4, FIM_MUSIC		    	       	# Se o indice atual for maior do que o NUM_OF_NOTES agt zera o indice
 	
 	la t0, CURRENT_NOTE_INDEX 		# Carrega o endereco do index
 	la t1, CURRENT_NOTE_DURATION 	# Carrega o endereco da nota atual
 	sw zero, 0(t0)			      		# Zera o valor
 	sw zero, 0(t1)			      		# Zera o valor
-FIM:	ret
+FIM_MUSIC:
+	csrr s9, time	
+
+MUSIC_RET:	
+	ret
