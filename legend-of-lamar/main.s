@@ -78,15 +78,6 @@ MENU_LOOP:
 
 	j MENU_LOOP
 	
-START_TEXT:
-	la a0,zelda_text
-	li a1,0
-	call PRINT
-	li a1,1
-	CALL PRINT
-	li a7,32
-  	li a0,2000
-  	ecall
   	
  # tela comeca na linha 64	
 GAME_PREP:
@@ -121,6 +112,11 @@ GAME_LOOP:
 	
 	j GAME_LOOP
 	
+
+GAME_OVER:
+j GAME_OVER
+
+
 
 .include "modules/enemy_manager.s"
 .include "modules/item_manager.s"

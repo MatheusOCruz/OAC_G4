@@ -1,12 +1,20 @@
 .data 
 .include "../assets/tiles/goblin.data"
-
+.include "..//assets/tiles/boss_temp.data"
 sprite_inimigo: .word 
-goblin
-# 78
+goblin,
+0,
+0,
+0,
+0,
+0,
+0,
+boss_temp
+# 
+# 0x010b,112,160,0x7806,
 inimigos_tela: .half 
-0x010b,112,160,0x1e06,
-0x010b,112,144,0x1e06,
+0x0710,112,160,0,
+0,0,0,0,
 0,0,0,0,
 0,0,0,0, 
 0,0,0,0,
@@ -204,6 +212,8 @@ ENEMY_MOVE_END:
 
 
 
+# TODO
+# muda o ret para continuar o loop agr meu rei
 GERA_DROP:
     csrr t0,time
     li t1,10
@@ -264,22 +274,35 @@ COLISAO_INIMIGO:
 # trem pro boss q e grandao
 
 PRINT_INIMIGO:
+    li t0,7
+    li a4,16
     la a0,sprite_inimigo
+    slli t1,s1,2 # id*4 
+    add a0,a0,t1
     lw a0,0(a0)
-    
-    
+    mv a6,s6
+    bne s1,t0,PRINT_INIMIGO_2
+# MUDANCAS DO PRINT PRO BOSS
+# metade nao vai ser necessario dps 
+
+    addi a4,a4,16 
+    li a6,0 
 PRINT_INIMIGO_2:
+   
+    
     mv a1,s3
     mv a2,s4
-    li a4,16
     # pega o frame do s6 e bota no a6
-    mv a6,s6
+    
     addi sp,sp,-4
     sw ra,0(sp)
     call PRINT_SPRITE
     lw ra,0(sp)
     addi sp,sp,4
     ret 
+
+
+
 
 # a1 = x ataque 
 # a2 = y ataque
@@ -327,7 +350,6 @@ REMOVE_ENEMY:
     tail GERA_DROP
 
     
-
 
 
 

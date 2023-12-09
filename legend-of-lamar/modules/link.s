@@ -23,7 +23,9 @@ link_bombas: .half 0
 .text
 
 UPDATE_LINK:
-
+	la t0,link_vida
+	lb t1,0(t0)
+	beq t1,zero,GAME_OVER
 	la t0, invul_frames
 	lb t1,0(t0)
 	beq t1,zero,UPDATE_LINK_2

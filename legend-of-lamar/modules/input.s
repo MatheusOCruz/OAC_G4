@@ -6,7 +6,7 @@ GET_INPUT_MENU:
 	andi t0,t0,0x0001		# mascara o bit menos significativo
    	beq t0,zero,NO_INPUT   		# Se n?o h? tecla pressionada ent?o vai para FIM
    	sw zero,0(t1)
-  	j START_TEXT	
+  	j GAME_PREP	
   		
 
 GET_INPUT:	
