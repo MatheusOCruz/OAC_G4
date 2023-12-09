@@ -17,8 +17,8 @@ link_vida: .byte 8
 invul_frames: .byte 0 
 
 link_moedas: .half 0
-link_cafezin: .half 15
-link_bombas: .half 3
+link_cafezin: .half 0
+link_bombas: .half 0
 
 .text
 
@@ -71,7 +71,7 @@ LINK_ATACK:
 	addi t0,s6,-4
 	la t1,arma_ataque
 	slli t0,t0,2 # cada id ocupa uma word (0->0, 1->4)
-	#add t1,t1,t0
+	add t1,t1,t0
 
 	lw a0,0(t1)  # enderecos da arma atual
 
