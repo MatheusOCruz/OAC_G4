@@ -251,18 +251,23 @@ ENEMY_HIT_LINK:
 
 
 COLISAO_INIMIGO:
+    li t0,7
+    li a0,16
+    bne s1,t0,COLISAO_INIMIGO_2
+    addi a0,a0,16
+COLISAO_INIMIGO_2:
 	la t0,link_pos
 	lh t1,0(t0)
 	lh t2,2(t0)
 	addi t0,t1,16
 	slt t3, a1,t0 # item.x < link.x + link.w
-	addi t0,a1,16
+	add t0,a1,a0
 	slt t4,t1,t0  # link.x < item.x + item.w
 	and t3,t3,t4  # ja faz o and dos dois pra liberar o t4
 	addi t0,t2,16
 	slt t4,a2,t0  # item.y < link.y + link.h
 	and t3,t3,t4  # libera t4 ja
-	addi t0,a2,16
+	add t0,a2,a0
 	slt t4,t2,t0  # link.t < item.y + item.h
 	and t3,t3,t4
 	
@@ -283,10 +288,9 @@ PRINT_INIMIGO:
     mv a6,s6
     bne s1,t0,PRINT_INIMIGO_2
 # MUDANCAS DO PRINT PRO BOSS
-# metade nao vai ser necessario dps 
 
     addi a4,a4,16 
-    li a6,0 
+    li a6,0 #eventualmente isso aqui vai mudar, mas so durante o ataque do homem
 PRINT_INIMIGO_2:
    
     
@@ -315,16 +319,20 @@ CHECK_ENEMY_HIT:
 CHECK_ENEMY_HIT_LOOP:  
     # s1 = id, s2 = vida, s3 = x s4 = y s5 = duracao frame s6 = frame atual|direcao q o homi ta de olho
     load_enemy(s7) 
-
+    
     mv t1,s3    # x inimigo
     mv t2,s4    # y inimigo
-
-    addi t0,t1,16
+    li t0,7
+    li a0,16
+    bne t0,s1,CHECK_ENEMY_HIT_LOOP_2
+    addi a0,a0,16 # tamanho do boss
+CHECK_ENEMY_HIT_LOOP_2:
+    add t0,t1,a0
 	slt t3, a1,t0 # item.x < link.x + link.w
 	addi t0,a1,16
 	slt t4,t1,t0  # link.x < item.x + item.w
 	and t3,t3,t4  # ja faz o and dos dois pra liberar o t4
-	addi t0,t2,16
+	add t0,t2,a0
 	slt t4,a2,t0  # item.y < link.y + link.h
 	and t3,t3,t4  
 	addi t0,a2,16

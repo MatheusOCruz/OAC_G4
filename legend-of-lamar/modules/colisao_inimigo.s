@@ -23,7 +23,7 @@ CHECK_COLISAO_INIMIGO:
 
 
 CALCULA_CIMA_INIMIGO:
-
+		
 		slli t0,s3,4
 		slli t1,t4,4
 		li t2,60
