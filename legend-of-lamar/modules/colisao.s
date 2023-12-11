@@ -62,6 +62,10 @@ PULA_CALCULO:		#se ele tiver na posiçao normal do quadrado, deixa ele mover mei
 		mv a7,t4
 		mv s5,t3
 		snez a4,t4
+		addi t4,t4,-13
+		snez t0,t4
+		and a4,a4,t0
+		addi t4,t4,13
 		
 		ret
 
@@ -73,6 +77,10 @@ CALCULA_OFFSET:		#checa se ele ta no meio certinho de um quadrado ou se ta deslo
 		snez a4,t4
 		snez t5,t5
 		or a4,a4,t5	#se ele estiver entre 2 quadrados horizontalmente e algum dos dois nao for vazio ele nao pode andar
+		addi t4,t4,-13
+		snez t0,t4
+		and a4,a4,t0
+		addi t4,t4,13
 		
 		li t0,6
 		beq t0,t4,cavernosa
@@ -87,6 +95,10 @@ VOLTA_CALCULO:
 		mv s5,t3
 		snez a4,t4		#se nao for um quadrado vazio a4 = 1, o q significa q ele nao pode andar. caso seja um item coletavel ele ve isso em outra funçao
 		beq t0,t4,cavernosa	#faz as paradas pra ir pra caverna
+		addi t4,t4,-13
+		snez t0,t4
+		and a4,a4,t0
+		addi t4,t4,13
 		
 		ret
 		

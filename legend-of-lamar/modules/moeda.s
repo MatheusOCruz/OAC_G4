@@ -1,13 +1,19 @@
 .text
 ITEM:
+	li t3,1
+	li t6,13
+	beq s1,t3,TA_NA_DG
+	li t6,0
 	
-	li t3,13
-	beq a7,t3,COLETA_MOEDA  #define o item que vai coletar
-	li t3,14
-	beq a7,t3,COLETA_MOEDA
-	li t3,15
-	beq a7,t3,CAFE
+TA_NA_DG:
+
 	li t3,16
+	beq a7,t3,COLETA_MOEDA  #define o item que vai coletar
+	li t3,17
+	beq a7,t3,COLETA_MOEDA
+	li t3,18
+	beq a7,t3,CAFE
+	li t3,19
 	beq a7,t3,CAFE
 	
 	ret
@@ -34,7 +40,7 @@ COLETA_MOEDA:
 	sh t1,0(t0)
 	
 	li a4,0			#tira a moeda do mapa e permite q ele ande
-	sb zero,0(s5)
+	sb t6,0(s5)
 	
 	ret
 
@@ -59,7 +65,7 @@ CAFE:				#literamente igual a moeda so q com cafe
 	sh t1,0(t0)
 	
 	li a4,0
-	sb zero,0(s5)
+	sb t6,0(s5)
 	
 	li a4,0
 	ret

@@ -1,7 +1,7 @@
 .text
 ANIMA_ESTATICO:
 	
-	li t0,13	
+	li t0,16
 	blt a6,t0,END_ESTATICO  #checa se o tile deve ter animação
 	
 	la t0,anim_frame
@@ -13,8 +13,8 @@ ANIMA_ESTATICO:
 	
 	li t0,2
 	rem t0,a6,t0
-	beqz t0,SUBTRAI
-	b ADICIONA
+	beqz t0,ADICIONA
+	b SUBTRAI
 	
 SUBTRAI:
 
