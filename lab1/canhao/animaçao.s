@@ -16,7 +16,7 @@ EXPLOSAO:
 	
 	la t0,nave_posx
 	lw a5,0(t0)  
-	slli a5,a5,2  #x da nave
+
 	
 	lw a2,4(t0)  
 	li t1,320

@@ -26,41 +26,100 @@ NAVE_SETUP:
 	li a7, 41
 	li a0,0
 	li a1, 160  #pega numero aleatorio
+	nop
+	nop
+	nop
 	ecall
+	nop
+	nop
+	nop
 	srli a0,a0,24
+	nop
+	nop
+	nop
 	bgt a0,a1,NAVE_SETUP
+	nop
+	nop
+	nop
 	blt a0,zero,NAVE_SETUP
+	nop
+	nop
+	nop
 	sw a0,4(t1)
 	
 REDO:
 	li a0,0
 	li a1,260
+	nop
+	nop
+	nop
 	ecall
+	nop
+	nop
+	nop
 	srli a0,a0,24
+	nop
+	nop
+	nop
 	bgt a0,a1,REDO
+	nop
+	nop
+	nop
 	blt a0,zero,REDO
+	nop
+	nop
+	nop
 	sw a0,0(t1)
+	nop
+	nop
+	nop
 	
 LOOP:
 	jal CHECK_INPUT  #faz a parte dos inputs
+	nop
+	nop
+	nop
 	jal PRINT_LINE_DATA
+	nop
+	nop
+	nop
 	jal PRINT_NAVE_SETUP
+	nop
+	nop
+	nop
 	b LOOP
+	nop
+	nop
+	nop
 	
 
 PRINT_NAVE_SETUP:
 	la t0,nave_posx  #pegando os dados que precisa pra printar a nave
+	nop
+	nop
+	nop
 	lw t1,4(t0)   #y da nave
 	lw t2,0(t0)   #x da nave
 	li t3,320
+	nop
+	nop
+	nop
 	mul t1,t1,t3  #pula y linhas
+	nop
+	nop
+	nop
 	add t1,t1,t2
 	li a2,0xff000000  #memoria inicial do display
+	nop
+	nop
+	nop
 	add a2,a2,t1   #a2= posição da nave
 	
 	
 	mv t5,s0
-	slli t5,t5,20
+	nop
+	nop
+	nop
 	add a2,a2,t5
 	
 	addi a3,a2,643  #fim d
@@ -75,52 +134,142 @@ PRINT_NAVE: #a0 = endereço nave,a1 = largura nave, a2 = posição inicial no di
 	addi a0,a0,1
 	addi a2,a2,1
 	addi a4,a4,1
+	nop
+	nop
+	nop
 	bge a2,a3,END_NAVE
+	nop
+	nop
+	nop
 	beq a4,a1,PULA_LINHA
+	nop
+	nop
+	nop
 	b PRINT_NAVE
+	nop
+	nop
+	nop
 
 PULA_LINHA:
 	addi a2,a2,317  #passa pra proxima linha
 	li a4,0
 	b PRINT_NAVE
+	nop
+	nop
+	nop
 	
 END_NAVE:
 	ret
+	nop
+	nop
+	nop
 	
 	
 
 CHECK_INPUT:
 	li s1,0xFF200000  #endereço da memoria do teclado
+	nop
+	nop
+	nop
 	lw t0,0(s1)		
+	nop
+	nop
+	nop
 	andi t0,t0,0x0001 	#mascara o bit menos significativo
+	nop
+	nop
+	nop
    	beq t0,zero,NO_INPUT   #pega os inputs
+   	nop
+	nop
+	nop
    	
    	mv s11,ra
+   	nop
+	nop
+	nop
    	jal LIMPA 
+   	nop
+	nop
+	nop
    	mv ra,s11
    	
-  	lw t2,4(s1)			
+  	lw t2,4(s1)	
+  	nop
+	nop
+	nop		
   	li t0,'w'
+  	nop
+	nop
+	nop
   	beq t2,t0,CIMA
+  	nop
+	nop
+	nop
 	li t0,'q'
+	nop
+	nop
+	nop
 	beq t2,t0,FORTE
+	nop
+	nop
+	nop
 	li t0,'s'
+	nop
+	nop
+	nop
 	beq t0,t2,BAIXO
+	nop
+	nop
+	nop
 	li t0,'a'
+	nop
+	nop
+	nop
 	beq t2,t0,FRACO
+	nop
+	nop
+	nop
 	li t0,32
+	nop
+	nop
+	nop
 	beq t2,t0,TIRO_PREP
+	nop
+	nop
+	nop
 	ret
+	nop
+	nop
+	nop
 	
 CIMA:
 	la t0,angulo  #mira pra cima(aumenta angulo)
+	nop
+	nop
+	nop
 	lb t2,0(t0)
+	nop
+	nop
+	nop
 	li t1,90
+	nop
+	nop
+	nop
 	beq t1,t2,LOOP
+	nop
+	nop
+	nop
 	addi t2,t2,1
+	nop
+	nop
+	nop
 	sb t2,0(t0)
 	li a2,32
 	ret
+	nop
+	nop
+	nop
 
 BAIXO:
 	la t0,angulo  #mira pra baixo
@@ -191,7 +340,6 @@ PRINT_LINE:  #fa1 = velocidade, fa0 = seno do angulo, fa2 = cos do angulo
 	fcvt.wu.s a3,ft0
 	sub a3,a1,a3
 	li a4,152   #definindo os valores de acordo com o ecall
-	slli t5,s0,20
 	mv a5,t5
 	ecall
 	 
