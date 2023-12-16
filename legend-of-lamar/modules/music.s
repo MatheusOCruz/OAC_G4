@@ -4,7 +4,7 @@ NOTES: .word 77, 214, 81, 214, 83, 428, 77, 214, 81, 214, 83, 428, 77, 214, 81, 
 			
 NUM_OF_NOTES: .word 355 			# O numero de notas na verdade e esse valor dividido por 8, pra facilitar a logica
 CURRENT_NOTE_INDEX: .word 0 		# O indice sempre sera o numero que devemos adicionar no endereco original pra encontrar a nota atual
-CURRENT_NOTE_DURATION: .word 300 # A duracao da nota atual para ser usada na main, inicialmente pode ser a primeira
+CURRENT_NOTE_DURATION: .word 214 # A duracao da nota atual para ser usada na main, inicialmente pode ser a primeira
 
 .text
 
@@ -39,8 +39,9 @@ MUSIC_PLAY:
 	# Se chegamos no indice final reseta a musica
 	la t3, NUM_OF_NOTES 			# Carrega o endereco do NUM_OF_NOTES
 	lw t3, 0(t3)		    		# Substitui o t3 pelo valor no endereco
-	li t5, 8			    		# Carrega 8 	    	       
-	ble  t2, t4, FIM_MUSIC		   	# Se o indice atual for maior do que o NUM_OF_NOTES agt zera o indice
+	li t5, 8			    		# Carrega 8
+	div t2, t2, t5					# Divide o valor do index por 8 para obter o numero da nota atual   	       
+	ble  t2, t3, FIM_MUSIC		   	# Se o indice atual for maior do que o NUM_OF_NOTES agt zera o indice
 	
 	la t0, CURRENT_NOTE_INDEX 		# Carrega o endereco do index
 	la t1, CURRENT_NOTE_DURATION 	# Carrega o endereco da nota atual
