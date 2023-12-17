@@ -5,10 +5,11 @@
 j MAIN
 	
 .data
+fogo_bool: .byte 0
 arma_a: .byte 4
 arma_b: .byte 0		  # depois tem q definir o id de cada arma pra fazer isso
 dano_items: .byte 0,0,20,0,1,10 # 0 nao sao itens, depende do id
-general_pos: .half 5,8 
+
 anim_frame: .word 0000,0000
 pos_offset: .byte 0,0 #y/x
 map_location: .byte 2,2  # qual dos mapas na matrix dos tilemaps o bicho ta (x,y)
@@ -24,6 +25,7 @@ direcao:  .byte 0 	# direcao que o jovem ta durante o ataque
 
 .text	
 .include "modules/itens.s"
+.include "modules/dano.s"
 .include "modules/print_menu.asm"
 .include "modules/colisao_inimigo.s"
 .include "modules/input.s"
@@ -91,11 +93,11 @@ GAME_LOOP:
 	frame_delay(s11) #cap de 60fps
 	csrr s11, time	# Salva o tempo atual
 	xori s0,s0,1  # troca frame
-	call ITENS
+	call ENTIDADES
 	call MUSIC_MANAGER
 	call MAP_MANAGER 
 	call HUD_MANAGER #(algo ta quebrado :( )
-	call ITENS
+	call ENTIDADES
 	
 	call UPDATE_LINK
 
@@ -111,7 +113,7 @@ j GAME_OVER
 
 
 
-.include "modules/enemy_manager.s"
-.include "modules/item_manager.s"
+
 .include "modules/link.s"
 .include "modules/colisao.s"
+.include "modules/enemy_hit.s"

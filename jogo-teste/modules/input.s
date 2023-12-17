@@ -34,9 +34,11 @@ NO_INPUT:
 
 
 ATACK_1:
+
 	la t0,link_espada
 	lb t0,0(t0)
 	beq t0,zero,NO_INPUT
+	
 	la t0, arma_a
 	lb s6, 0(t0)
 	la t0, atacando
@@ -61,7 +63,6 @@ MV_UP:
 	
 	li t4,0
 	beq a0,t4,TELA_UP   # t5 = -1 e pq passou do limite da tela, troca de mapa 
-
 	bgt a4,zero,NO_INPUT
 	
 	addi a2,a2,-16

@@ -1,9 +1,10 @@
 .text
 #s3 = x
 #s4 = y
-#t5 = tamanho
+#a4 = tamanho
 
 CHECK_COLISAO_INIMIGO:
+
 		la t0,map_location  		#em qual dos mapas o link ta
 		lb t1,0(t0)			#x
 		lb t2,1(t0)			#y
@@ -12,6 +13,12 @@ CHECK_COLISAO_INIMIGO:
 		li t4,660			#tamanho y da tela
 		mul t4,t2,t4			#tamanho em y vezes o numero de telas
 		add a1,t3,t4			#posição do link no mapa geral
+	
+		li t2,60
+		addi s4,s4,-4
+		mul s4,t2,s4
+		add a1,a1,s4
+		add a1,a1,s3
 		
 		li t0,1
 		beq a5,t0,CALCULA_CIMA_INIMIGO
@@ -24,61 +31,45 @@ CHECK_COLISAO_INIMIGO:
 
 CALCULA_CIMA_INIMIGO:
 		
-		slli t0,s3,4
-		slli t1,t4,4
-		li t2,60
-		mul t1,t1,t2
-		
-		add a1,a1,t0
-		add a1,a1,t1
-		
 		addi a1,a1,-60
+		beq s4,zero,END_INIMIGO2
 		b END_CALCULO_INIMIGO
 		
 CALCULA_ESQUERDA_INIMIGO:
-
-		slli t0,s3,4
-		slli t1,t4,4
-		li t2,60
-		mul t1,t1,t2
-		
-		add a1,a1,t0
-		add a1,a1,t1
-		
 		addi a1,a1,-1
+		beq s3,zero,END_INIMIGO2
+		
 		b END_CALCULO_INIMIGO
 
 CALCULA_BAIXO_INIMIGO:
-
-		slli t0,s3,4
-		slli t1,t4,4
-		li t2,60
-		mul t1,t1,t2
-		
-		add a1,a1,t0
-		add a1,a1,t1
-		
+		srli t5,a4,4
+		addi t5,t5,-1
+		li t3,60
+		mul t5,t5,t3
+		add a1,a1,t5
 		addi a1,a1,60
+		
+		li t1,600
+
+		beq s4,t1,END_INIMIGO2
 		b END_CALCULO_INIMIGO
 		
 CALCULA_DIREITA_INIMIGO:
-
-		slli t0,s3,4
-		slli t1,t4,4
-		li t2,60
-		mul t1,t1,t2
-		
-		add a1,a1,t0
-		add a1,a1,t1
-		
 		addi a1,a1,1
+		li t3,19
+
+		beq s3,t3,END_INIMIGO2
 		
 END_CALCULO_INIMIGO:
 		la t3,teste_mapa_tilemap
+		addi t3,t3,8
 		add t3,t3,a1
 		lb t4,0(t3)	     #pega o valor do quadrado
-		mv a7,t4
-		mv s5,t3
-		snez a4,t4
+		addi t4,t4,-2
+		slt a7,t4,zero
 		
 		ret
+
+END_INIMIGO2:
+	li a7,0
+	ret

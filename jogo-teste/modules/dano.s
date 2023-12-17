@@ -1,0 +1,113 @@
+.text
+CHECK_DANO:
+	slli t0,a1,4
+	slli t1,a2,4
+	
+	la  t2,link_pos
+	lh t3,2(t2)
+	lh t2,0(t2)
+	
+	la t4,pos_offset
+	lb t5,1(t4)
+	lb t4,0(t4)
+	srli t5,t5,3
+	srli t4,t4,3
+	
+	blt t2,t0,X_MENOR_DANO
+	sub t2,t2,t0
+X_VOLTA_DANO:
+	
+	blt t3,t1,Y_MENOR_DANO
+	sub t3,t3,t1
+
+Y_VOLTA_DANO:
+	add t2,t2,t3
+	sub t2,t2,t5
+	sub t2,t2,t4
+	li t1,16
+	bgeu t2,t1,END_DANO
+	la t0,link_vida
+	lb t1,0(t0)
+	addi t1,t1,-1
+	sb t1,0(t0)
+
+END_DANO:
+	ret
+	
+X_MENOR_DANO:
+	sub t2,t0,t2
+	b X_VOLTA_DANO
+	
+Y_MENOR_DANO:
+	sub t3,t1,t3
+	b Y_VOLTA_DANO
+
+
+
+
+CHECK_DANO_BOSS: 
+	li t6,0
+CHECK_DANO_BOSS2:
+	
+	slli t0,a1,4
+	slli t1,a2,4
+	
+	la  t2,link_pos
+	lh t3,2(t2)
+	lh t2,0(t2)
+	
+	la t4,pos_offset
+	lb t5,1(t4)
+	lb t4,0(t4)
+	srli t5,t5,3
+	srli t4,t4,3
+	
+	blt t2,t0,X_MENOR_DANO_BOSS
+	sub t2,t2,t0
+X_VOLTA_DANO_BOSS:
+	
+	blt t3,t1,Y_MENOR_DANO_BOSS
+	sub t3,t3,t1
+
+Y_VOLTA_DANO_BOSS:
+	add t2,t2,t3
+	sub t2,t2,t5
+	sub t2,t2,t4
+	li t1,16
+	blt t2,t1,CAUSA_DANO_BOSS
+	
+	lb a1,2(s2)
+	lb a2,3(s2)
+	addi t6,t6,1
+	addi a1,a1,1
+	li t1,1
+	beq t1,t6,CHECK_DANO_BOSS2
+	addi a2,a2,1
+	li t1,2
+	beq t1,t6,CHECK_DANO_BOSS2
+	addi a1,a1,-1
+	li t1,3
+	beq t1,t6,CHECK_DANO_BOSS2
+	
+	lb a1,2(s2)
+	lb a2,3(s2)
+	ret
+	
+
+CAUSA_DANO_BOSS:		
+	la t0,link_vida
+	lb t1,0(t0)
+	addi t1,t1,-1
+	sb t1,0(t0)
+	
+	lb a1,2(s2)
+	lb a2,3(s2)
+	ret
+	
+X_MENOR_DANO_BOSS:
+	sub t2,t0,t2
+	b X_VOLTA_DANO_BOSS
+	
+Y_MENOR_DANO_BOSS:
+	sub t3,t1,t3
+	b Y_VOLTA_DANO_BOSS

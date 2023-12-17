@@ -2,6 +2,8 @@
 .data
 
 .include "../assets/tiles/tilemap_com_dg_temp.data"
+.include "../assets/tiles/linel.data"
+.include "../assets/tiles/warrior.data"
 x_inicial: .byte 0
 y_inicial: .byte 64
 camera:	   .byte 40,22

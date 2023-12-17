@@ -16,9 +16,9 @@ link_sprite_num: .byte 5  # char da animacao da andanda
 link_vida: .byte 8
 invul_frames: .byte 0 
 
-link_espada: .byte 0
+link_espada: .half 0
 link_moedas: .half 0
-link_cafezin: .half 0
+link_cafezin: .half 50
 link_bombas: .half 0
 
 .text
@@ -155,7 +155,7 @@ CHECK_FOR_ATACK_DAMAGE:
 	add a3,a3,s6 #id da arma de ataque 
 	lb a3,0(a3) # dano do ataque
 	# a1,a2 -> x,y da hitbox do atack do link
-	CALL CHECK_ENEMY_HIT
+	call CHECK_ENEMY_HIT
 	
 LINK_ATACK_RET:
 

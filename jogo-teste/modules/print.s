@@ -1,6 +1,6 @@
 .data 
 .include "../assets/tiles/itens1.data"
-.include "../assets/tiles/lista_itens.data"
+.include "../assets/tiles/entidades.data"
 .include "../assets/tiles/menu_1.data"
 .include "../assets/tiles/zelda_text.data"
 .include "../assets/tiles/zelda_hud.data"
