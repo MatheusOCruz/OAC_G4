@@ -151,6 +151,10 @@ CALCULA_ESQUERDA:
 		
 		
 cavernosa:
+	la t0,pos_offset
+	sb zero,0(t0)
+	sb zero,1(t0)
+	
 	la t0,map_location
 	lb t1,0(t0)
 	lb t2,1(t0)

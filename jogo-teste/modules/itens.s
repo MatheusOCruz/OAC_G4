@@ -69,7 +69,7 @@ ENTIDADES:
 	lw s5,4(t0)	#tempo da ultima animaçao
 	csrr s11,time	#atualiza tempo atual
 	sub t1,s11,s5	#diferença de tempo
-	li t2,300	#delay da animaçao
+	li t2,500	#delay da animaçao
 	li s10,1	#valor salvo pra editar a animaçao
 	blt t1,t2,NAO_ANIMA_ITEM
 	li s10,0	#modifica o valor caso deva animar
