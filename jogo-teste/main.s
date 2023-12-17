@@ -6,7 +6,7 @@ j MAIN
 	
 .data
 fogo_bool: .byte 0
-arma_a: .byte 4
+arma_a: .byte 0
 arma_b: .byte 0		  # depois tem q definir o id de cada arma pra fazer isso
 dano_items: .byte 0,0,20,0,1,10 # 0 nao sao itens, depende do id
 

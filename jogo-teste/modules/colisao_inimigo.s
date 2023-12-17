@@ -14,13 +14,13 @@ CHECK_COLISAO_INIMIGO:
 		mul t4,t2,t4			#tamanho em y vezes o numero de telas
 		add a1,t3,t4			#posição do link no mapa geral
 	
-		li t2,60
+		li t2,60			#calcula a posiçao do inimigo na tela e soma ela com a posiçao no mapa
 		addi s4,s4,-4
 		mul s4,t2,s4
 		add a1,a1,s4
 		add a1,a1,s3
 		
-		li t0,1
+		li t0,1				#define pra qual direçao ta tentando andar
 		beq a5,t0,CALCULA_CIMA_INIMIGO
 		li t0,2
 		beq a5,t0,CALCULA_ESQUERDA_INIMIGO
@@ -29,10 +29,10 @@ CHECK_COLISAO_INIMIGO:
 		b CALCULA_DIREITA_INIMIGO
 
 
-CALCULA_CIMA_INIMIGO:
+CALCULA_CIMA_INIMIGO:				#pega o quadrado na direçao indicada
 		
 		addi a1,a1,-60
-		beq s4,zero,END_INIMIGO2
+		beq s4,zero,END_INIMIGO2	#se ele tiver nas bordas da tela conta como colisao pra ele nao sair da sala
 		b END_CALCULO_INIMIGO
 		
 CALCULA_ESQUERDA_INIMIGO:
@@ -44,7 +44,7 @@ CALCULA_ESQUERDA_INIMIGO:
 CALCULA_BAIXO_INIMIGO:
 		srli t5,a4,4
 		addi t5,t5,-1
-		li t3,60
+		li t3,60			#eu fiz isso 2 da manha e nao lembro pq ta aqui :)
 		mul t5,t5,t3
 		add a1,a1,t5
 		addi a1,a1,60
@@ -61,12 +61,12 @@ CALCULA_DIREITA_INIMIGO:
 		beq s3,t3,END_INIMIGO2
 		
 END_CALCULO_INIMIGO:
-		la t3,teste_mapa_tilemap
-		addi t3,t3,8
-		add t3,t3,a1
-		lb t4,0(t3)	     #pega o valor do quadrado
-		addi t4,t4,-2
-		slt a7,t4,zero
+		la t3,teste_mapa_tilemap	#endereço do bitmap
+		addi t3,t3,8			#pula os dados
+		add t3,t3,a1			#soma o valor do bitmap com a posiçao do inimigo pra achar onde ele ta
+		lb t4,0(t3)	     	#pega o valor do quadrado
+		addi t4,t4,-2		#os quadrados andaveis sao o 0 e 1
+		slt a7,t4,zero		
 		
 		ret
 

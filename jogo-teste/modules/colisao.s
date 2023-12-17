@@ -50,7 +50,7 @@ pra_direita_nao_arruma:
 		mv s10,t3
 		
 		li t0,0
-		beq a5,t0,CALCULA_CIMA
+		beq a5,t0,CALCULA_CIMA		#decidindo pra qual lado ta andando
 		li t0,2
 		beq a5,t0,CALCULA_ESQUERDA
 		li t0,1
@@ -70,23 +70,23 @@ PULA_CALCULO:		#se ele tiver na posiçao normal do quadrado, deixa ele mover mei
 		
 		ret
 
-CALCULA_OFFSET:		#checa se ele ta no meio certinho de um quadrado ou se ta deslocado em 8 pra arrumar a colisao
+CALCULA_OFFSET:		#checa se ele ta no meio certinho de um quadrado ou se ta deslocado em 8 pra arrumar a colisao, pq caso esteja no meio ele tem q testar colisao dos 2
 		lb t4,0(t3)
 		lb t5,-1(t3)	#pega o quadrado 1 pra baixo e um pra esquerda
 		
-		mul t1,t4,t5
-		add t1,t1,t4
+		mul t1,t4,t5	#fazendo esses calculos, isso sempre vai dar 36 caso os 2 quadrados sejam  de entrar/sair da caverna
+		add t1,t1,t4	#
 		sub t1,t1,t5
 		
 		mv a7,t4	#salva dados
 		mv s5,t3
-		addi t2,t4,-2
-		addi t5,t5,-2
+		addi t2,t4,-2	#os quadrados andaveis tao nas posiçoes 0 e 1
+		addi t5,t5,-2	#entao se subtrair 2 do quadrado e o valor foi maior ou igual a zero nao pode andar
 		
-		li t0,36
+		li t0,36		#checa se deve ir/sair da caverna
 		beq t1,t0,CAVERNOSA1
 		
-		slt t2,zero,t2
+		slt t2,zero,t2		#checa os dois quadrados
 		slt t5,zero,t5
 		
 		or a4,t2,t5	#se ele estiver entre 2 quadrados horizontalmente e algum dos dois nao for vazio ele nao pode andar
@@ -94,7 +94,7 @@ CALCULA_OFFSET:		#checa se ele ta no meio certinho de um quadrado ou se ta deslo
 		ret
 		
 CAVERNOSA1:	
-		la t0,pos_offset
+		la t0,pos_offset	#anula o offset quando vai pra caverna
 		sb zero,0(t0)
 		sb zero,1(t0)
 		b cavernosa	
@@ -151,18 +151,18 @@ CALCULA_ESQUERDA:
 		
 		
 cavernosa:
-	la t0,pos_offset
+	la t0,pos_offset #arruma o offset de posiçao na transiçao entre areas
 	sb zero,0(t0)
 	sb zero,1(t0)
 	
-	la t0,map_location
+	la t0,map_location	#pega qual sala esta atualmente
 	lb t1,0(t0)
 	lb t2,1(t0)
 	li t3,3
 	mul t2,t2,t3
-	add t1,t1,t2
+	add t1,t1,t2		#x * 3y pra pegar a posiçao absoluta da tela
 	
-	li t2,0
+	li t2,0			#decide em qual sala ta
 	beq t1,t2,SALA0
 	
 	li t2,1
@@ -182,17 +182,17 @@ cavernosa:
 	
 SALA0:
 	
-	li t1,1
+	li t1,1		#a sala q ele deve ir de acordo com a sala atual
 	li t2,3
 	
-	la t3,camera
+	la t3,camera	#define a camera pra sala certa
 	li t5,20
 	li t6,33
 	sb t5,0(t3)
 	sb t6,1(t3)
 	
 	
-	sb t1,0(t0)
+	sb t1,0(t0)	#define a pos no mapa certa
 	sb t2,1(t0)
 	li a0,1
 	li a4,1
@@ -205,7 +205,7 @@ SALA0:
 	
 	ret
 	
-SALA1:
+SALA1:			#tudo igual daqui pra frente, so muda pra onde ta indo
 	li t1,0
 	li t2,4
 	
