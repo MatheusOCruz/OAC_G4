@@ -26,7 +26,7 @@ direcao:  .byte 0 	# direcao que o jovem ta durante o ataque
 .text	
 .include "modules/itens.s"
 .include "modules/dano.s"
-.include "modules/print_menu.asm"
+.include "modules/print_menu.s"
 .include "modules/colisao_inimigo.s"
 .include "modules/input.s"
 .include "modules/print.s"
@@ -96,7 +96,7 @@ GAME_LOOP:
 	call ENTIDADES
 	call MUSIC_MANAGER
 	call MAP_MANAGER 
-	call HUD_MANAGER #(algo ta quebrado :( )
+	call HUD_MANAGER 
 	call ENTIDADES
 	
 	call UPDATE_LINK
