@@ -19,8 +19,8 @@ escudo: .word 1,0
 
 link_espada: .half 0
 link_moedas: .half 0
-link_cafezin: .half 99
-link_bombas: .half 0
+link_cafezin: .half 10
+
 
 .text
 

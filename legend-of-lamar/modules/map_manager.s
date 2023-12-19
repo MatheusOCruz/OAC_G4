@@ -260,10 +260,11 @@ transicao_fim_ret:
 	lw s4,20(sp)
 	lw s5,24(sp)
 	addi sp,sp,28
-	
+
 	ret
+
 	
-	
+
 PRINT_MAP_TRANSITION_VERTICAL_NL:
 	
 	add s0,s0,s1
@@ -271,6 +272,7 @@ PRINT_MAP_TRANSITION_VERTICAL_NL:
 	mv s2,zero    # reseta contador da linha
 	j MAP_TRANSITION_VERTICAL_PRINT_P2
 	
+
 
 
 

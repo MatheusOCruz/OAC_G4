@@ -34,8 +34,6 @@ direcao:  .byte 0 	# direcao que o jovem ta durante o ataque
 .include "modules/music.s"
 .include "modules/hud_manager.s"
 
-.include "modules/SYSTEMv21.s"
-
 #	s0 = frame atual
 #	s1 = 0 mundo aberto 1 dungeon 2 cavernosa
 #   s5 -> duracao frame de ataque do link (os outros usam memoria)
@@ -57,12 +55,13 @@ direcao:  .byte 0 	# direcao que o jovem ta durante o ataque
 .end_macro
 
 .macro set_frame_duration(%fr)
-li t0, 1000
+	li t0, 1000
 	li t1, 60
 	fcvt.s.w ft0, t0 
 	fcvt.s.w ft1, t1 
 	fdiv.s %fr, ft0, ft1      #tempo do frame (1000/60)
 .end_macro
+
 
 MAIN:
 	call PRINT_MENU
@@ -96,13 +95,14 @@ GAME_LOOP:
 	call ENTIDADES
 	call MUSIC_MANAGER
 	call MAP_MANAGER 
+	call CHECK_IN_SHOP
 	call HUD_MANAGER 
 	call ENTIDADES
 	
 	call UPDATE_LINK
 
 	muda_frame()
-
+	
 	call GET_INPUT   
 	
 	j GAME_LOOP
@@ -111,9 +111,35 @@ GAME_LOOP:
 GAME_OVER:
 j GAME_OVER
 
-
+CHECK_IN_SHOP:	
+	la t0,map_location
+	lb t1,0(t0)
+	beq t1,zero, CHECK_IN_SHOP_1
+	ret	
+CHECK_IN_SHOP_1:
+	lb t1,1(t0)
+	li t2,3
+	beq t1,t2,CHECK_IN_SHOP_2
+	ret
+CHECK_IN_SHOP_2:
+	la a0, abre_o_bolso
+	li a1,112
+	li a2,96
+	mv a3,s0
+	li a4,96
+	li a6,0
+	
+	addi sp,sp,-4
+	sw ra,0(sp)
+	call PRINT_SPRITE
+	lw ra,0(sp)
+	addi sp,sp,4
+	ret
 
 
 .include "modules/link.s"
 .include "modules/colisao.s"
 .include "modules/enemy_hit.s"
+.include "modules/SYSTEMv21.s"
+.data 
+.include "assets/tiles/abre_o_bolso.data"
