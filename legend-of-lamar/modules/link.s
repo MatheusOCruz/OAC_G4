@@ -10,15 +10,16 @@ link_atack_right_madeira
 
 
 
-duracao_frame: .byte 5 # duracao por frame e nao por tempo 
+duracao_frame: .byte 3 # duracao por frame e nao por tempo 
 link_pos: .half 128,144   # pos do link na tela (x,y)
 link_sprite_num: .byte 5  # char da animacao da andanda
 link_vida: .byte 8
 invul_frames: .byte 0 
+escudo: .word 1,0
 
 link_espada: .half 0
 link_moedas: .half 0
-link_cafezin: .half 50
+link_cafezin: .half 99
 link_bombas: .half 0
 
 .text
@@ -60,7 +61,9 @@ UPDATE_LINK_2:
 	li a5,16    # futuramente usa altura pq tem sprite com mais de 16 (ataque)
 	call PRINT_SPRITE
 	lw ra,0(sp)
-	addi sp,sp,4
+	lw s1,4(sp)
+	lw s2,8(sp)
+	addi sp,sp,12
 	ret
 	
 #  a0 contem o dano (1 e meio coracao)                                             
