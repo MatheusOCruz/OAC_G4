@@ -3,10 +3,11 @@
 .include "../assets/tiles/items_temp.data"
 
 
-pos_vida  : .half 224,36 # (x,y)
+
+pos_vida: .half 224,36 # (x,y)
 pos_moedas: .half 136,20 # (x,y)
-pos_cafe: .half 136,36 # (x,y)
-pos_bombas: .half 136,44 # (x,y)
+pos_cafe: .half 136,44 # (x,y)
+
 
 pos_arma_a: .half 188,28
 pos_arma_b: .half 164,28
@@ -14,10 +15,12 @@ pos_arma_b: .half 164,28
 .text
 # s3 = vida
 # a6 = 0 full a6 = 1, half a6 = 2 vazi
-
+		
 
 # 128,20 moeda
 HUD_MANAGER:
+	
+	
 
 PRINT_VIDA:
 	mv a3,s0
@@ -100,22 +103,7 @@ PRINT_CAFE_2:
 	li a7,101
 	ecall
 	
-PRINT_BOMBAS:
 
-	la t0,link_bombas
-	lh a0,0(t0)
-	li t0,999
-	blt a0,t0,PRINT_BOMBAS_2
-	li a0,999  
-	# tem mais de 999 moedas, mas para o display em 999
-PRINT_BOMBAS_2:
-	la t0,pos_bombas
-	lh a1,0(t0)
-	lh a2,2(t0)
-	li a3,255
-	mv a4,s0
-	li a7,101
-	ecall
 	
 	
 # falta as 2 arminhas 
