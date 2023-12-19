@@ -2,14 +2,15 @@
 .include "modules/MACROSv21.s"
 
 .text
-j GAME_PREP
+j MAIN
 	
 .data
-arma_a: .byte 4
+fogo_bool: .byte 0
+arma_a: .byte 0
 arma_b: .byte 0		  # depois tem q definir o id de cada arma pra fazer isso
 dano_items: .byte 0,0,20,0,1,10 # 0 nao sao itens, depende do id
-general_pos: .half 5,8 
-anim_frame: .word 0,0
+
+anim_frame: .word 0000,0000
 pos_offset: .byte 0,0 #y/x
 map_location: .byte 2,2  # qual dos mapas na matrix dos tilemaps o bicho ta (x,y)
 
@@ -23,9 +24,10 @@ direcao:  .byte 0 	# direcao que o jovem ta durante o ataque
 
 
 .text	
+.include "modules/itens.s"
+.include "modules/dano.s"
+.include "modules/print_menu.s"
 .include "modules/colisao_inimigo.s"
-.include "modules/anima_estatico.s"
-.include "modules/moeda.s"
 .include "modules/input.s"
 .include "modules/print.s"
 .include "modules/map_manager.s"
@@ -63,14 +65,7 @@ li t0, 1000
 .end_macro
 
 MAIN:
-	
-	li s0,0
-	la a0,menu_1
-	li a1,0
-	li a2,0
-	call PRINT
-	li a1,1 
-	call PRINT
+	call PRINT_MENU
 	
 MENU_LOOP:
 	
@@ -98,12 +93,12 @@ GAME_LOOP:
 	frame_delay(s11) #cap de 60fps
 	csrr s11, time	# Salva o tempo atual
 	xori s0,s0,1  # troca frame
-
+	call ENTIDADES
 	call MUSIC_MANAGER
 	call MAP_MANAGER 
-	call HUD_MANAGER #(algo ta quebrado :( )
-	call ITEM_MANAGER
-	call ENEMY_MANAGER
+	call HUD_MANAGER 
+	call ENTIDADES
+	
 	call UPDATE_LINK
 
 	muda_frame()
@@ -118,7 +113,7 @@ j GAME_OVER
 
 
 
-.include "modules/enemy_manager.s"
-.include "modules/item_manager.s"
+
 .include "modules/link.s"
 .include "modules/colisao.s"
+.include "modules/enemy_hit.s"

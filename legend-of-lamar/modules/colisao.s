@@ -1,6 +1,7 @@
 .text
 
 CHECK_COLISAO:
+
 		
 		la t0,map_location  		#em qual dos mapas o link ta
 		lb t1,0(t0)			#x
@@ -49,7 +50,7 @@ pra_direita_nao_arruma:
 		mv s10,t3
 		
 		li t0,0
-		beq a5,t0,CALCULA_CIMA
+		beq a5,t0,CALCULA_CIMA		#decidindo pra qual lado ta andando
 		li t0,2
 		beq a5,t0,CALCULA_ESQUERDA
 		li t0,1
@@ -62,43 +63,52 @@ PULA_CALCULO:		#se ele tiver na posiçao normal do quadrado, deixa ele mover mei
 		mv a7,t4
 		mv s5,t3
 		snez a4,t4
-		addi t4,t4,-13
+		addi t4,t4,-16
 		snez t0,t4
 		and a4,a4,t0
-		addi t4,t4,13
+		addi t4,t4,16
 		
 		ret
 
-CALCULA_OFFSET:		#checa se ele ta no meio certinho de um quadrado ou se ta deslocado em 8 pra arrumar a colisao
+CALCULA_OFFSET:		#checa se ele ta no meio certinho de um quadrado ou se ta deslocado em 8 pra arrumar a colisao, pq caso esteja no meio ele tem q testar colisao dos 2
 		lb t4,0(t3)
 		lb t5,-1(t3)	#pega o quadrado 1 pra baixo e um pra esquerda
-		mv a7,t4	
-		mv s5,t3
-		snez a4,t4
-		snez t5,t5
-		or a4,a4,t5	#se ele estiver entre 2 quadrados horizontalmente e algum dos dois nao for vazio ele nao pode andar
-		addi t4,t4,-13
-		snez t0,t4
-		and a4,a4,t0
-		addi t4,t4,13
 		
-		li t0,6
-		beq t0,t4,cavernosa
+		mul t1,t4,t5	#fazendo esses calculos, isso sempre vai dar 36 caso os 2 quadrados sejam  de entrar/sair da caverna
+		add t1,t1,t4	#
+		sub t1,t1,t5
+		
+		mv a7,t4	#salva dados
+		mv s5,t3
+		addi t2,t4,-2	#os quadrados andaveis tao nas posiçoes 0 e 1
+		addi t5,t5,-2	#entao se subtrair 2 do quadrado e o valor foi maior ou igual a zero nao pode andar
+		
+		li t0,36		#checa se deve ir/sair da caverna
+		beq t1,t0,CAVERNOSA1
+		
+		slt t2,zero,t2		#checa os dois quadrados
+		slt t5,zero,t5
+		
+		or a4,t2,t5	#se ele estiver entre 2 quadrados horizontalmente e algum dos dois nao for vazio ele nao pode andar
 		
 		ret
 		
+CAVERNOSA1:	
+		la t0,pos_offset	#anula o offset quando vai pra caverna
+		sb zero,0(t0)
+		sb zero,1(t0)
+		b cavernosa	
 		
 VOLTA_CALCULO:
 		lb t4,0(t3)	     	#pega o valor do quadrado
-		li t0,6			#valor equivalente da caverna
+		li t0,5			#valor equivalente da caverna
 		mv a7,t4		#guardando alguns valores q vai precisar depois
 		mv s5,t3
-		snez a4,t4		#se nao for um quadrado vazio a4 = 1, o q significa q ele nao pode andar. caso seja um item coletavel ele ve isso em outra funçao
+		addi t4,t4,-1
+		slt a4,zero,t4		#se nao for um quadrado vazio a4 = 1, o q significa q ele nao pode andar. caso seja um item coletavel ele ve isso em outra funçao
+
 		beq t0,t4,cavernosa	#faz as paradas pra ir pra caverna
-		addi t4,t4,-13
-		snez t0,t4
-		and a4,a4,t0
-		addi t4,t4,13
+		addi t4,t4,1
 		
 		ret
 		
@@ -141,122 +151,172 @@ CALCULA_ESQUERDA:
 		
 		
 cavernosa:
-	addi sp,sp,-4
-	sw ra,0(sp)
-	call CLEAR_ITEMS
-	lw ra,0(sp)
-	addi sp,sp,4
-	#  decide onde ta, mapa/dungeon/caverna
-	li t0,1 
-	beq s1,t0, TA_NA_DUNGEON
-	bne s1,zero, TA_NA_CAVERNOSA
-	#aqui ta no mundo aberto
-	# trem opcoes de caverna 
-	# 2 2 -> caverna de item 1
-	# 0 0 -> caverna de item 2
-	# 0 1 -> entrada da dungeon
-	la t0, map_location
-	lb t1, 0(t0)
-	li t2,2
-	bne t1,t2, cavernosa_teste2
-	# aqui ta na tela 2,2
-	
-	
-	# carrega (0,3) na posicao
-	li t1,3
-	sb t1,1(t0)
-	sb zero,0(t0) 
-	
-	# carrega na camera // dps fazer transicao pra caverna 
-	la t0, camera	  
-
+	la t0,pos_offset #arruma o offset de posiçao na transiçao entre areas
 	sb zero,0(t0)
-	li t1,33
-	sb t1,1(t0)
+	sb zero,1(t0)
 	
-	# atualiza posicao
-	la t0,link_pos
-	li t1,128
+	la t0,map_location	#pega qual sala esta atualmente
+	lb t1,0(t0)
+	lb t2,1(t0)
+	li t3,3
+	mul t2,t2,t3
+	add t1,t1,t2		#x * 3y pra pegar a posiçao absoluta da tela
+	
+	li t2,0			#decide em qual sala ta
+	beq t1,t2,SALA0
+	
+	li t2,1
+	beq t1,t2,SALA1
+	
+	li t2,8
+	beq t1,t2,SALA8
+	
+	li t2,9
+	beq t1,t2,SALA9
+	
+	li t2,10
+	beq t1,t2,SALA10
+	
+	li t2,12
+	beq t1,t2,SALA12
+	
+SALA0:
+	
+	li t1,1		#a sala q ele deve ir de acordo com a sala atual
+	li t2,3
+	
+	la t3,camera	#define a camera pra sala certa
+	li t5,20
+	li t6,33
+	sb t5,0(t3)
+	sb t6,1(t3)
+	
+	
+	sb t1,0(t0)	#define a pos no mapa certa
+	sb t2,1(t0)
+	li a0,1
+	li a4,1
+	
+	la t0,link_pos	#definindo a posiçao q o link sai da porta
+	li t1,144
 	sh t1,0(t0)
 	li t1,208
 	sh t1,2(t0)
 	
-	li s1,2 # indica que ta na caverna
+	ret
 	
-	# nessa sala tem a espada de madeira pra pickup
-	li a0,4 	# id da espada
-	li a1,128	# x q a espada aparece
-	li a2,144 	# y que a espada aparece
+SALA1:			#tudo igual daqui pra frente, so muda pra onde ta indo
+	li t1,0
+	li t2,4
 	
-	tail ADD_ITEM # nao faz mais nada aqui, pode dar return de dentro do add
+	la t3,camera
+	li t5,0
+	li t6,44
+	sb t5,0(t3)
+	sb t6,1(t3)
 	
-
-cavernosa_teste2:
-	lb t1,0(t0)
-	bne t1,zero, ENTRA_DUNGEON
-	
-	# carrega (1,3) na posicao
-	li t1,3
 	sb t1,0(t0)
-	li t1,1
-	sb t1,1(t0) 
+	sb t2,1(t0)
+	li a0,1
+	li a4,1
 	
-	# carrega na camera // dps fazer transicao pra caverna 
-	la t0, camera	   
-	li t1,20
+	la t0,link_pos	#definindo a posiçao q o link sai da porta
+	li t1,128
+	sh t1,0(t0)
+	li t1,80
+	sh t1,2(t0)
+	
+	ret
+
+SALA8:
+	
+	
+	la t3,camera	#definindo a posiçao da camera
+	li t5,0
+	li t6,33
+	sb t5,0(t3)
+	sb t6,1(t3)
+	
+	
+	li t1,0		#definindo a posiçao correta do mapa_pos
+	li t2,3
 	sb t1,0(t0)
-	li t1,33
-	sb t1,1(t0)
-	li s1,2 # indica que ta na caverna
-	ret
-
-
-
-ENTRA_DUNGEON:
-	# carrega (0,4) na posicao
-	li t1,4
-	sb t1,1(t0)
-	sb zero,0(t0) 
+	sb t2,1(t0)
+	li a0,1
+	li a4,1
 	
-	# carrega na camera // dps fazer transicao pra caverna 
-	la t0, camera	  
-	sb zero,0(t0)
-	li t1,44
-	sb t1,1(t0)
-	ret
-
-
-TA_NA_DUNGEON:
-	ret
+	la t0,link_pos	#definindo a posiçao q o link sai da porta
+	li t1,144
+	sh t1,0(t0)
+	li t1,208
+	sh t1,2(t0)
 	
-TA_NA_CAVERNOSA:
-	# se estamos em 0,3 -> 2,2
-	# se estamos em 1,3 -> 0,0
-	la t0 map_location
-	lb t1,0(t0)
-	bne t1,zero TA_NA_CAVERNOSA2
-	# atualiza no map de colisao
+	ret
+
+SALA9:
+	
+	
+	la t3,camera
+	li t5,40
+	li t6,22
+	sb t5,0(t3)
+	sb t6,1(t3)
+	
 	li t1,2
+	li t2,2
 	sb t1,0(t0)
-	sb t1,1(t0)
-	# atualiza camera
-	la t0,camera
-	li t1,40
-	sb t1,0(t0)
-	li t1,22
-	sb t1,1(t0)
-	# atualiza posicao
-	la t0,link_pos
-	li t1, 32
+	sb t2,1(t0)
+	li a0,1
+	li a4,1	
+	
+	la t0,link_pos	#definindo a posiçao q o link sai da porta
+	li t1,32
 	sh t1,0(t0)
 	li t1,160
 	sh t1,2(t0)
 	
-	li s1,0 #salva que ta no mundo aberto
-	la t2,pos_offset
-	sb zero,0(t2)
-	sb zero,1(t2)
 	ret
 
-TA_NA_CAVERNOSA2:
+SALA10:
+	la t3,camera
+	sb zero,0(t3)
+	sb zero,1(t3)
+	
+	sb zero,0(t0)
+	sb zero,1(t0)
+	li a0,1
+	li a4,1
+	
+	la t0,link_pos	#definindo a posiçao q o link sai da porta
+	li t1,64
+	sh t1,0(t0)
+	li t1,128
+	sh t1,2(t0)
+	
+	ret	
+	
+SALA12:
+	li t1,1
+	li t2,0
+	
+	la t3,camera
+	li t5,20
+	li t6,0
+	sb t5,0(t3)
+	sb t6,1(t3)
+	
+	sb t1,0(t0)
+	sb t2,1(t0)
+	li a0,1
+	li a4,1
+	
+	la t0,link_pos	#definindo a posiçao q o link sai da porta
+	li t1,112
+	sh t1,0(t0)
+	li t1,96
+	sh t1,2(t0)
+	
 	ret
+
+	
+	

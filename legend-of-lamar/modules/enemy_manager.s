@@ -10,7 +10,7 @@ goblin,
 0,
 0,
 boss_temp
-# 
+# 0x0710,112,160,0,
 # 0x010b,112,160,0x7806,
 inimigos_tela: .half 
 0x0710,112,160,0,

@@ -1,5 +1,6 @@
 .data 
 .include "../assets/tiles/vida.data"
+.include "../assets/tiles/items_temp.data"
 
 
 pos_vida  : .half 224,36 # (x,y)

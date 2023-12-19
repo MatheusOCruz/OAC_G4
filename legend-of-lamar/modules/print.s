@@ -1,11 +1,10 @@
 .data 
-.include "../assets/tiles/menu_1.data"
-.include "../assets/tiles/zelda_text.data"
+.include "../assets/tiles/itens1.data"
+.include "../assets/tiles/entidades.data"
 .include "../assets/tiles/zelda_hud.data"
 .include "../assets/tiles/link_teste.data"
 .include "../assets/tiles/link_walk.data"
 .include "../assets/tiles/tiles_tela_1.data"
-.include "../assets/tiles/secreta.data"
 
 .text
 
