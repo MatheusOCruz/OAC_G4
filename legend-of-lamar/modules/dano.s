@@ -1,7 +1,7 @@
 .text
 CHECK_DANO:
 	la t0,escudo
-	lw t1,4(t0)
+	lw t1,0(t0)
 	csrr t2,time
 	sub t2,t2,t1
 	li t1,1000
@@ -57,7 +57,7 @@ Y_MENOR_DANO:
 
 CHECK_DANO_BOSS: 	#o boss é bem parecido so q no caso ele é 32x32
 	la t0,escudo
-	lw t1,4(t0)
+	lw t1,0(t0)
 	csrr t2,time
 	sub t2,t2,t1
 	li t1,1000

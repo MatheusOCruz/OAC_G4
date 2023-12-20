@@ -11,7 +11,7 @@ GET_INPUT_MENU:
 
 GET_INPUT:	
 	la t0,escudo
-	lw t1,4(t0)
+	lw t1,0(t0)
 	csrr t2,time
 	sub t2,t2,t1
 	li t1,1000
@@ -42,12 +42,13 @@ NO_INPUT:
 	ret
 	
 ESCUDO:	
-	la t0,escudo
-	lw t1,0(t0)
+	la t0,arma_b
+	lb t1,0(t0)
 	beq t1,zero,NO_INPUT
 	
+	la t0,escudo
 	csrr t1,time
-	sw t1,4(t0)
+	sw t1,0(t0)
 	ret
 	
 

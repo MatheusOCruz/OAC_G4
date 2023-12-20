@@ -19,9 +19,35 @@ pos_arma_b: .half 164,28
 
 # 128,20 moeda
 HUD_MANAGER:
+CLEAR_HUD:#essa parte printa 3 quadrados pretos por cima do numero de moedas/cafe pq se nao fica bugado
+	addi sp,sp,-4
+	sw ra,0(sp)
+	
+	la a0,game_tiles	
+	li a1,136
+	li a2,16
+	mv a3,s0
+	li a4,16
+	li a5,16
+	li a6,6
+	call PRINT_SPRITE
+	
+	la a0,game_tiles
+	li a2,32
+	li a4,16
+	li a6,6
+	call PRINT_SPRITE
+	
+	la a0,game_tiles
+	li a2,48
+	li a4,16
+	li a6,6
+	call PRINT_SPRITE
+	
+	lw ra,0(sp)
+	addi sp,sp,4
 	
 	
-
 PRINT_VIDA:
 	mv a3,s0
 	
@@ -41,6 +67,8 @@ PRINT_VIDA:
 	
 	li s0,4
 	li a4,16
+	
+	
 PRINT_VIDA_LOOP:
 	
 	li t1,2

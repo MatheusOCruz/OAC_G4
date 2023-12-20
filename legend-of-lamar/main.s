@@ -12,7 +12,7 @@ dano_items: .byte 0,0,20,0,1,10 # 0 nao sao itens, depende do id
 
 anim_frame: .word 0000,0000
 pos_offset: .byte 0,0 #y/x
-map_location: .byte 0,0  # qual dos mapas na matrix dos tilemaps o bicho ta (x,y)
+map_location: .byte 2,2  # qual dos mapas na matrix dos tilemaps o bicho ta (x,y)
 
 item_counter: .byte 0	#quantidade de itens na tela atual 
 enemy_counter: .byte 0	# quantidade de inimigos na tela atual

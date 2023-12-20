@@ -15,7 +15,7 @@ link_pos: .half 128,144   # pos do link na tela (x,y)
 link_sprite_num: .byte 5  # char da animacao da andanda
 link_vida: .byte 8
 invul_frames: .byte 0 
-escudo: .word 1,0
+escudo: .word 0
 
 link_espada: .half 0
 link_moedas: .half 10
