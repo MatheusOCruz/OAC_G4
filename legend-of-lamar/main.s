@@ -12,7 +12,7 @@ dano_items: .byte 0,0,20,0,1,10 # 0 nao sao itens, depende do id
 
 anim_frame: .word 0000,0000
 pos_offset: .byte 0,0 #y/x
-map_location: .byte 2,2  # qual dos mapas na matrix dos tilemaps o bicho ta (x,y)
+map_location: .byte 0,0  # qual dos mapas na matrix dos tilemaps o bicho ta (x,y)
 
 item_counter: .byte 0	#quantidade de itens na tela atual 
 enemy_counter: .byte 0	# quantidade de inimigos na tela atual
@@ -114,7 +114,8 @@ j GAME_OVER
 CHECK_IN_SHOP:	
 	la t0,map_location
 	lb t1,0(t0)
-	beq t1,zero, CHECK_IN_SHOP_1
+	li t2,1
+	beq t1,t2, CHECK_IN_SHOP_1
 	ret	
 CHECK_IN_SHOP_1:
 	lb t1,1(t0)
@@ -134,6 +135,31 @@ CHECK_IN_SHOP_2:
 	call PRINT_SPRITE
 	lw ra,0(sp)
 	addi sp,sp,4
+
+	la t0,lista_itens	#.data com as informaçoes de cada item por tela
+	addi t0,t0,8		#pula dados
+	la t1,map_location	#mapa atual
+	lb t2,0(t1)	#pos x
+	lb t3,1(t1)	#pos y
+	li t4,3			#mapas por linha
+	mul t3,t3,t4
+	add t2,t2,t3		#calcula a posiçao atual
+	li t4,50		#qtd de bytes por mapa
+	mul t1,t2,t4
+	add t1,t1,t0
+	lb t0,4(t1)
+		
+	beq t0,zero,CHECK_IN_SHOP_RET
+
+	li a0,20
+	li a1,144
+	li a2,161
+	li a3,199
+	slli a3,a3,8
+	mv a4,s0
+	li a7,101
+	ecall
+CHECK_IN_SHOP_RET:
 	ret
 
 

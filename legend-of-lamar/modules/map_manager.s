@@ -6,7 +6,7 @@
 .include "../assets/tiles/warrior.data"
 x_inicial: .byte 0
 y_inicial: .byte 64
-camera:	   .byte 40,22
+camera:	   .byte 0,0 #40,22
 
 .text
 

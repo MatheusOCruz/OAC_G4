@@ -61,8 +61,8 @@
 	addi sp,sp,32
 .end_macro
 	
-ENTIDADES:	
 
+ENTIDADES:	
 	salva_pilha()
 	la t0,anim_frame	#qual parte da animaçao fazer
 	lw s4,0(t0)	 #frame atual
@@ -102,6 +102,7 @@ LOOP_ITEM:
 	lb t1,1(s2)		#pega tipo de item
 	lb a1,2(s2)		#pos x
 	lb a2,3(s2)		#pos y
+	
 	
 	mv s7,t1		#salva o tipo em s7 pra determinar açoes depois
 	la a0,itens1		#endereço do bitmap dos itens
@@ -146,6 +147,9 @@ Y_VOLTA:
 	li t2,16
 	bge t1,t2,NAO_COLIDE0	#se a diferença for > 16 nao colide
 	
+	li t0,8
+	beq t0,s7 LOJINHA
+
 	la t0,link_moedas 	#caso colida decide qual item ta coletando
 	beq s7,zero,PULA
 	
@@ -153,6 +157,8 @@ Y_VOLTA:
 	addi s7,s7,-1
 	beq s7,zero,PULA
 	
+	
+
 	la t0,arma_a
 	li t2,4
 	sb t2,0(t0)
@@ -160,7 +166,19 @@ Y_VOLTA:
 	la t0,link_espada
 	addi s7,s7,-1
 	beq s7,zero,PULA
-	
+
+
+LOJINHA:
+	lb t0,4(s2) # custo
+	la t1,link_moedas
+	lh t2,0(t1) # moedas
+	blt t2,t0,NAO_COLIDE0 #nao tem dinheiro pra comprar
+	sub t2,t2,t0
+	sh t2,0(t1)
+	la t0,arma_b
+	li t1,5
+	sb t1,0(t0)
+
 	
 PULA:				#remove o item da tela e adiciona no valor do item coletado
 	

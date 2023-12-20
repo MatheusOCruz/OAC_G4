@@ -18,7 +18,7 @@ invul_frames: .byte 0
 escudo: .word 1,0
 
 link_espada: .half 0
-link_moedas: .half 0
+link_moedas: .half 10
 link_cafezin: .half 10
 
 
