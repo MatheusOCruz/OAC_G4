@@ -169,6 +169,10 @@ PULA:				#remove o item da tela e adiciona no valor do item coletado
 	sh t1,0(t0)		#salva o valor
 	li t2,-1		#coloca -1 na memoria do item, oq significa q ele nao printa mais
 	sb t2,0(s2)
+	sb zero,1(s2)
+	sb zero,2(s2)
+	sb zero,3(s2)
+	sb zero,4(s2)
 NAO_COLIDE0:
 	srli a1,a1,4		#indice da pos x
 	srli a2,a2,4		#y

@@ -10,6 +10,13 @@ GET_INPUT_MENU:
   		
 
 GET_INPUT:	
+	la t0,escudo
+	lw t1,4(t0)
+	csrr t2,time
+	sub t2,t2,t1
+	li t1,1000
+	blt t2,t1,NO_INPUT
+	
 	la t0,atacando
 	lb t0,0(t0)
 	bne t0,zero, NO_INPUT
@@ -24,6 +31,8 @@ GET_INPUT:
 	beq t2,t0,MV_LEFT
 	li t0,'x'
 	beq t2,t0,ATACK_1
+	li t0,'z'
+	beq t2,t0,ESCUDO
 	
 	tail GET_INPUT_PART_2
 	
@@ -31,7 +40,16 @@ GET_INPUT:
 	
 NO_INPUT:
 	ret
-
+	
+ESCUDO:	
+	la t0,escudo
+	lw t1,0(t0)
+	beq t1,zero,NO_INPUT
+	
+	csrr t1,time
+	sw t1,4(t0)
+	ret
+	
 
 ATACK_1:
 

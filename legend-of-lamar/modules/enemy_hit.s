@@ -121,19 +121,15 @@ ACERTO:
 	
 
 MATA_E_DROPA:	
-	li a7,41		#pegando uns numeros aleatorios pro drop
-	ecall
+	csrr a0,time
 	li t2,2
-	rem t3,a0,t2
-	ecall
 	rem t2,a0,t2
 	
-	and t2,a0,t2
 	li t3,32
 	mul t3,t3,t2		
 	sb t2,1(t1)		#coloca um drop aleatorio(moeda ou cafe) no lugar do inimigo
 	sb t3,0(t1)
-	
+	sb zero,4(t1)
 	b ATACK_LINE
 	
 END_CHECK_ATACK:

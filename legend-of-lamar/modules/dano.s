@@ -1,5 +1,13 @@
 .text
 CHECK_DANO:
+	la t0,escudo
+	lw t1,4(t0)
+	csrr t2,time
+	sub t2,t2,t1
+	li t1,1000
+	blt t2,t1,NO_INPUT
+	
+	
 	slli t0,a1,4		#pegando posiçao em pixel
 	slli t1,a2,4
 	
@@ -48,6 +56,14 @@ Y_MENOR_DANO:
 
 
 CHECK_DANO_BOSS: 	#o boss é bem parecido so q no caso ele é 32x32
+	la t0,escudo
+	lw t1,4(t0)
+	csrr t2,time
+	sub t2,t2,t1
+	li t1,1000
+	blt t2,t1,NO_INPUT
+	
+	
 	li t6,0		#define q é um boss
 CHECK_DANO_BOSS2:
 	
